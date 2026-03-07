@@ -61,4 +61,10 @@ public class ItemRepository : IItemRepository
             .Where(i => i.ListId == listId)
             .CountAsync();
     }
+
+    public async Task UpdateManyAsync(IEnumerable<ShoppingItem> items)
+    {
+        var conn = await _context.GetConnectionAsync();
+        await conn.UpdateAllAsync(items);
+    }
 }

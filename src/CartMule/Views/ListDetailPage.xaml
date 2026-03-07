@@ -15,13 +15,13 @@
         <converters:StringNotEmptyConverter x:Key="StringNotEmpty" />
     </ContentPage.Resources>
 
-    <Grid RowDefinitions="Auto,*">
+    <Grid RowDefinitions="{OnPlatform iOS='182,*', Default='154,*'}">
 
-        <!-- ── Yellow header ─────────────────────────────────────────── -->
+        <!-- ── Yellow header (matches dashboard hero height) ─────────── -->
         <Grid Grid.Row="0"
               ColumnDefinitions="44,*,44"
               ColumnSpacing="4"
-              Padding="{OnPlatform iOS='12,52,12,16', Default='12,20,12,16'}">
+              Padding="{OnPlatform iOS='12,52,12,0', Default='12,24,12,0'}">
 
             <Button Grid.Column="0"
                     Text="←"
@@ -32,23 +32,17 @@
                     Padding="0"
                     WidthRequest="44"
                     HeightRequest="44"
-                    VerticalOptions="Center"
+                    VerticalOptions="End"
+                    Margin="0,0,0,28"
                     Clicked="OnBackClicked" />
 
-            <VerticalStackLayout Grid.Column="1"
-                                 VerticalOptions="Center"
-                                 Spacing="0">
-                <Label Text="{Binding CreatedDisplay}"
-                       FontSize="12"
-                       FontFamily="OpenSansRegular"
-                       TextColor="{StaticResource TextCharcoal}"
-                       Opacity="0.65"
-                       IsVisible="{Binding CreatedDisplay, Converter={StaticResource StringNotEmpty}}" />
-                <Label Text="{Binding Title}"
-                       Style="{StaticResource PageTitleLabel}"
-                       FontSize="24"
-                       LineBreakMode="TailTruncation" />
-            </VerticalStackLayout>
+            <Label Grid.Column="1"
+                   Text="{Binding Title}"
+                   Style="{StaticResource PageTitleLabel}"
+                   FontSize="28"
+                   LineBreakMode="TailTruncation"
+                   VerticalOptions="End"
+                   Margin="0,0,0,32" />
 
             <Button Grid.Column="2"
                     Text="✏"
@@ -59,7 +53,8 @@
                     Padding="0"
                     WidthRequest="44"
                     HeightRequest="44"
-                    VerticalOptions="Center"
+                    VerticalOptions="End"
+                    Margin="0,0,0,28"
                     Clicked="OnRenameClicked" />
         </Grid>
 
@@ -72,49 +67,66 @@
                 <RoundRectangle CornerRadius="24,24,0,0" />
             </Border.StrokeShape>
 
-            <Grid RowDefinitions="Auto,*">
+            <Grid RowDefinitions="Auto,Auto,*">
 
-                <!-- Search + Uncheck All row -->
+                <!-- Row 0: UpdatedAt + Uncheck All + yellow + button -->
                 <Grid Grid.Row="0"
-                      ColumnDefinitions="*,100"
+                      ColumnDefinitions="*,Auto,52"
                       ColumnSpacing="8"
-                      Margin="20,20,16,0">
-                    <Border Grid.Column="0"
-                            BackgroundColor="{StaticResource BackgroundGray}"
-                            StrokeThickness="0">
-                        <Border.StrokeShape>
-                            <RoundRectangle CornerRadius="14" />
-                        </Border.StrokeShape>
-                        <Grid ColumnDefinitions="*,40" Padding="16,0">
-                            <Entry Grid.Column="0"
-                                   Placeholder="Filter items..."
-                                   Text="{Binding SearchQuery}"
-                                   BackgroundColor="Transparent"
-                                   FontFamily="OpenSansRegular"
-                                   FontSize="15"
-                                   TextColor="{StaticResource TextCharcoal}"
-                                   PlaceholderColor="{StaticResource SubtleGray}"
-                                   ClearButtonVisibility="WhileEditing" />
-                            <Label Grid.Column="1"
-                                   Text="&#x1F50D;"
-                                   FontSize="16"
-                                   VerticalOptions="Center"
-                                   HorizontalOptions="Center" />
-                        </Grid>
-                    </Border>
-
+                      Padding="20,20,16,0">
+                    <Label Grid.Column="0"
+                           Text="{Binding UpdatedDisplay}"
+                           FontSize="13"
+                           FontFamily="OpenSansRegular"
+                           TextColor="{StaticResource SubtleGray}"
+                           VerticalOptions="Center" />
                     <Button Grid.Column="1"
                             Text="Uncheck All"
                             Style="{StaticResource GhostButton}"
                             IsVisible="{Binding HasBoughtItems}"
                             Command="{Binding UncheckAllCommand}"
                             FontSize="12"
-                            Padding="8,0"
-                            VerticalOptions="Fill" />
+                            Padding="12,0"
+                            VerticalOptions="Center" />
+                    <Button Grid.Column="2"
+                            Text="+"
+                            Style="{StaticResource FABButton}"
+                            WidthRequest="44"
+                            HeightRequest="44"
+                            CornerRadius="22"
+                            FontSize="22"
+                            VerticalOptions="Center"
+                            HorizontalOptions="Center"
+                            Clicked="OnAddItemClicked" />
                 </Grid>
 
-                <!-- Items area + FAB -->
-                <Grid Grid.Row="1">
+                <!-- Row 1: Full-width search bar -->
+                <Border Grid.Row="1"
+                        BackgroundColor="{StaticResource BackgroundGray}"
+                        StrokeThickness="0"
+                        Margin="20,12,20,0">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="14" />
+                    </Border.StrokeShape>
+                    <Grid ColumnDefinitions="*,40" Padding="16,0">
+                        <Entry Grid.Column="0"
+                               Placeholder="Filter items..."
+                               Text="{Binding SearchQuery}"
+                               BackgroundColor="Transparent"
+                               FontFamily="OpenSansRegular"
+                               FontSize="15"
+                               TextColor="{StaticResource TextCharcoal}"
+                               PlaceholderColor="{StaticResource SubtleGray}"
+                               ClearButtonVisibility="WhileEditing" />
+                        <Image Grid.Column="1"
+                               WidthRequest="20"
+                               HeightRequest="20"
+                               Source="search.png"/>
+                    </Grid>
+                </Border>
+
+                <!-- Row 2: Items area -->
+                <Grid Grid.Row="2">
 
                     <!-- Empty state -->
                     <VerticalStackLayout IsVisible="{Binding IsEmpty}"
@@ -136,14 +148,14 @@
                     <CollectionView ItemsSource="{Binding Groups}"
                                     IsGrouped="True"
                                     IsVisible="{Binding IsNotEmpty}"
-                                    Margin="0,8,0,90"
+                                    Margin="0,8,0,0"
                                     SelectionMode="None">
 
                         <CollectionView.GroupHeaderTemplate>
                             <DataTemplate x:DataType="vm:ItemGroup">
                                 <Label Text="{Binding Name}"
                                        Style="{StaticResource CategoryHeaderLabel}"
-                                       Margin="20,12,16,4" />
+                                       Margin="60,12,16,4" />
                             </DataTemplate>
                         </CollectionView.GroupHeaderTemplate>
 
@@ -180,19 +192,49 @@
                                     </SwipeView.RightItems>
 
                                     <VerticalStackLayout BackgroundColor="White">
-                                        <Grid ColumnDefinitions="48,*"
-                                              ColumnSpacing="4"
-                                              Padding="20,12">
+                                        <VerticalStackLayout.GestureRecognizers>
+                                            <DropGestureRecognizer
+                                                AllowDrop="True"
+                                                DropCommand="{Binding Source={RelativeSource AncestorType={x:Type vm:ListDetailViewModel}}, Path=ItemDroppedCommand}"
+                                                DropCommandParameter="{Binding}" />
+                                        </VerticalStackLayout.GestureRecognizers>
 
-                                            <!-- Checkbox circle -->
+                                        <Grid ColumnDefinitions="32,48,*,40,40"
+                                              ColumnSpacing="0"
+                                              Padding="12,10,4,10">
+
+                                            <!-- Col 0: Drag handle -->
                                             <Border Grid.Column="0"
+                                                    StrokeThickness="0"
+                                                    BackgroundColor="Transparent"
+                                                    WidthRequest="28"
+                                                    HeightRequest="36"
+                                                    VerticalOptions="Center"
+                                                    HorizontalOptions="Center">
+                                                <Border.GestureRecognizers>
+                                                    <DragGestureRecognizer
+                                                        CanDrag="True"
+                                                        DragStartingCommand="{Binding Source={RelativeSource AncestorType={x:Type vm:ListDetailViewModel}}, Path=ItemDragStartedCommand}"
+                                                        DragStartingCommandParameter="{Binding}"
+                                                        DropCompletedCommand="{Binding Source={RelativeSource AncestorType={x:Type vm:ListDetailViewModel}}, Path=ItemDragCompletedCommand}"
+                                                        DropCompletedCommandParameter="{Binding}" />
+                                                </Border.GestureRecognizers>
+                                                <Label Text="&#x2630;"
+                                                       TextColor="{StaticResource SubtleGray}"
+                                                       FontSize="15"
+                                                       HorizontalOptions="Center"
+                                                       VerticalOptions="Center" />
+                                            </Border>
+
+                                            <!-- Col 1: Checkbox circle -->
+                                            <Border Grid.Column="1"
                                                     WidthRequest="24"
                                                     HeightRequest="24"
                                                     StrokeThickness="2"
                                                     Stroke="{StaticResource SubtleGray}"
                                                     BackgroundColor="Transparent"
                                                     VerticalOptions="Center"
-                                                    HorizontalOptions="Start">
+                                                    HorizontalOptions="Center">
                                                 <Border.GestureRecognizers>
                                                     <TapGestureRecognizer
                                                         Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ListDetailViewModel}}, Path=ToggleBoughtCommand}"
@@ -217,10 +259,11 @@
                                                        IsVisible="{Binding IsBought}" />
                                             </Border>
 
-                                            <!-- Name + Quantity -->
-                                            <VerticalStackLayout Grid.Column="1"
+                                            <!-- Col 2: Name + Quantity (tap = edit) -->
+                                            <VerticalStackLayout Grid.Column="2"
                                                                  VerticalOptions="Center"
-                                                                 Spacing="2">
+                                                                 Spacing="2"
+                                                                 Padding="8,0">
                                                 <VerticalStackLayout.GestureRecognizers>
                                                     <TapGestureRecognizer
                                                         Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ListDetailViewModel}}, Path=EditItemCommand}"
@@ -235,23 +278,60 @@
                                                        IsVisible="{Binding Quantity, Converter={StaticResource StringNotEmpty}}" />
                                             </VerticalStackLayout>
 
+                                            <!-- Col 3: Pencil edit button (yellow) -->
+                                            <Border Grid.Column="3"
+                                                    BackgroundColor="{StaticResource PrimaryYellow}"
+                                                    StrokeThickness="0"
+                                                    WidthRequest="32"
+                                                    HeightRequest="32"
+                                                    VerticalOptions="Center"
+                                                    HorizontalOptions="Center">
+                                                <Border.StrokeShape>
+                                                    <RoundRectangle CornerRadius="8" />
+                                                </Border.StrokeShape>
+                                                <Border.GestureRecognizers>
+                                                    <TapGestureRecognizer
+                                                        Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ListDetailViewModel}}, Path=EditItemCommand}"
+                                                        CommandParameter="{Binding}" />
+                                                </Border.GestureRecognizers>
+                                                <Label Text="✏"
+                                                       TextColor="{StaticResource TextCharcoal}"
+                                                       FontSize="14"
+                                                       HorizontalOptions="Center"
+                                                       VerticalOptions="Center" />
+                                            </Border>
+
+                                            <!-- Col 4: X delete button -->
+                                            <Border Grid.Column="4"
+                                                    BackgroundColor="Transparent"
+                                                    StrokeThickness="0"
+                                                    WidthRequest="36"
+                                                    HeightRequest="36"
+                                                    VerticalOptions="Center"
+                                                    HorizontalOptions="Center">
+                                                <Border.GestureRecognizers>
+                                                    <TapGestureRecognizer
+                                                        Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ListDetailViewModel}}, Path=DeleteItemCommand}"
+                                                        CommandParameter="{Binding}" />
+                                                </Border.GestureRecognizers>
+                                                <Label Text="✕"
+                                                       TextColor="{StaticResource DangerRed}"
+                                                       FontSize="16"
+                                                       FontAttributes="Bold"
+                                                       HorizontalOptions="Center"
+                                                       VerticalOptions="Center" />
+                                            </Border>
+
                                         </Grid>
+
                                         <BoxView Style="{StaticResource SeparatorLine}"
-                                                 Margin="20,0,0,0" />
+                                                 Margin="12,0,0,0" />
                                     </VerticalStackLayout>
                                 </SwipeView>
                             </DataTemplate>
                         </CollectionView.ItemTemplate>
 
                     </CollectionView>
-
-                    <!-- FAB -->
-                    <Button Style="{StaticResource FABButton}"
-                            Text="+"
-                            HorizontalOptions="End"
-                            VerticalOptions="End"
-                            Margin="0,0,24,28"
-                            Clicked="OnAddItemClicked" />
 
                 </Grid>
             </Grid>

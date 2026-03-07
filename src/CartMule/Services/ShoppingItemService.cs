@@ -81,4 +81,9 @@ public class ShoppingItemService : IShoppingItemService
         }
         await _listService.TouchListAsync(listId);
     }
+
+    public async Task SaveSortOrdersAsync(IEnumerable<ShoppingItem> items)
+    {
+        await _itemRepo.UpdateManyAsync(items);
+    }
 }

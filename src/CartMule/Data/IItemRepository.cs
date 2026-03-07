@@ -11,4 +11,5 @@ public interface IItemRepository
     Task DeleteAsync(int id);
     Task DeleteByListIdAsync(int listId);
     Task<int> GetCountByListIdAsync(int listId);
+    Task UpdateManyAsync(IEnumerable<ShoppingItem> items);
 }

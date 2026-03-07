@@ -43,9 +43,11 @@ public partial class ListDetailViewModel : BaseViewModel
     string _searchQuery = string.Empty;
 
     [ObservableProperty]
-    string _createdDisplay = string.Empty;
+    string _updatedDisplay = string.Empty;
 
     partial void OnSearchQueryChanged(string value) => ApplyItemFilter();
+
+    private ShoppingItem? _draggedItem;
 
     public int ListId { get; set; }
 
@@ -68,13 +70,22 @@ public partial class ListDetailViewModel : BaseViewModel
         {
             var list = await _listService.GetListByIdAsync(ListId);
             Title = list?.Name ?? "List";
-            CreatedDisplay = list is not null
-                ? $"Created {list.CreatedAt.ToLocalTime():MMM d}"
+            UpdatedDisplay = list is not null
+                ? $"Updated {list.UpdatedAt.ToLocalTime():MMM d, H:mm}"
                 : string.Empty;
 
             var categories = await _categoryService.GetAllCategoriesAsync();
             _cachedCatNames = categories.ToDictionary(c => c.Id, c => c.Name);
             _allItems = await _itemService.GetItemsForListAsync(ListId);
+
+            // Initialise SortOrder on first load if none have been set yet
+            if (_allItems.Count > 1 && _allItems.All(i => i.SortOrder == 0))
+            {
+                for (int i = 0; i < _allItems.Count; i++)
+                    _allItems[i].SortOrder = i + 1;
+                await _itemService.SaveSortOrdersAsync(_allItems);
+            }
+
             ApplyItemFilter();
         }
         finally
@@ -94,16 +105,44 @@ public partial class ListDetailViewModel : BaseViewModel
     async Task DeleteItemAsync(ShoppingItem item)
     {
         await _itemService.DeleteItemAsync(item.Id);
-        foreach (var group in Groups)
+        _allItems.Remove(item);
+        ApplyItemFilter();
+    }
+
+    [RelayCommand]
+    void ItemDragStarted(ShoppingItem item) => _draggedItem = item;
+
+    [RelayCommand]
+    void ItemDragCompleted(ShoppingItem item) => _draggedItem = null;
+
+    [RelayCommand]
+    async Task ItemDropped(ShoppingItem target)
+    {
+        if (_draggedItem is null || ReferenceEquals(_draggedItem, target))
         {
-            if (group.Remove(item))
-                break;
+            _draggedItem = null;
+            return;
         }
-        var emptyGroups = Groups.Where(g => g.Count == 0).ToList();
-        foreach (var g in emptyGroups)
-            Groups.Remove(g);
-        IsEmpty = Groups.Count == 0;
-        HasBoughtItems = Groups.Any(g => g.IsBoughtGroup && g.Count > 0);
+
+        // Change category if dropped into a different group
+        _draggedItem.CategoryId = target.CategoryId;
+
+        // Rebuild order: remove dragged, insert before target
+        var ordered = _allItems.OrderBy(i => i.SortOrder).ToList();
+        ordered.Remove(_draggedItem);
+        var targetIdx = ordered.IndexOf(target);
+        if (targetIdx < 0) targetIdx = ordered.Count;
+        ordered.Insert(targetIdx, _draggedItem);
+
+        for (int i = 0; i < ordered.Count; i++)
+            ordered[i].SortOrder = i + 1;
+
+        await _itemService.SaveSortOrdersAsync(ordered);
+
+        // Reload from service so category-ordering is applied correctly
+        _allItems = await _itemService.GetItemsForListAsync(ListId);
+        _draggedItem = null;
+        ApplyItemFilter();
     }
 
     [RelayCommand]

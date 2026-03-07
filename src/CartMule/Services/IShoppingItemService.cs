@@ -15,4 +15,6 @@ public interface IShoppingItemService
     Task<ShoppingItem> ToggleBoughtAsync(int id);
     /// <summary>Sets all items in a list to IsBought=false and touches the list.</summary>
     Task UncheckAllAsync(int listId);
+    /// <summary>Persists updated SortOrder (and CategoryId) values for a batch of items.</summary>
+    Task SaveSortOrdersAsync(IEnumerable<ShoppingItem> items);
 }
