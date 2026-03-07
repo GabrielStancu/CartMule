@@ -26,7 +26,21 @@ public partial class ListDetailPage : ContentPage
 
     private async void OnAddItemClicked(object sender, EventArgs e)
     {
-        // Chunk 5: navigate to add/edit item page
         await Shell.Current.GoToAsync($"additem?listId={_viewModel.ListId}");
+    }
+
+    private async void OnRenameClicked(object sender, EventArgs e)
+    {
+        var newName = await DisplayPromptAsync(
+            "Rename List",
+            "Enter a new name for this list",
+            "Save",
+            "Cancel",
+            placeholder: _viewModel.Title,
+            initialValue: _viewModel.Title,
+            maxLength: 60);
+
+        if (string.IsNullOrWhiteSpace(newName)) return;
+        await _viewModel.RenameListAsync(newName.Trim());
     }
 }

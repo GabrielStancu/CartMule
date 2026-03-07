@@ -27,6 +27,9 @@ public partial class ListDetailViewModel : BaseViewModel
 
     public ObservableCollection<ItemGroup> Groups { get; } = [];
 
+    private List<ShoppingItem> _allItems = [];
+    private Dictionary<int, string> _cachedCatNames = [];
+
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(IsNotEmpty))]
     bool _isEmpty = true;
@@ -35,6 +38,14 @@ public partial class ListDetailViewModel : BaseViewModel
 
     [ObservableProperty]
     bool _hasBoughtItems;
+
+    [ObservableProperty]
+    string _searchQuery = string.Empty;
+
+    [ObservableProperty]
+    string _createdDisplay = string.Empty;
+
+    partial void OnSearchQueryChanged(string value) => ApplyItemFilter();
 
     public int ListId { get; set; }
 
@@ -57,12 +68,14 @@ public partial class ListDetailViewModel : BaseViewModel
         {
             var list = await _listService.GetListByIdAsync(ListId);
             Title = list?.Name ?? "List";
+            CreatedDisplay = list is not null
+                ? $"Created {list.CreatedAt.ToLocalTime():MMM d}"
+                : string.Empty;
 
             var categories = await _categoryService.GetAllCategoriesAsync();
-            var catNames = categories.ToDictionary(c => c.Id, c => c.Name);
-
-            var items = await _itemService.GetItemsForListAsync(ListId);
-            RebuildGroups(items, catNames);
+            _cachedCatNames = categories.ToDictionary(c => c.Id, c => c.Name);
+            _allItems = await _itemService.GetItemsForListAsync(ListId);
+            ApplyItemFilter();
         }
         finally
         {
@@ -103,6 +116,21 @@ public partial class ListDetailViewModel : BaseViewModel
     [RelayCommand]
     static async Task EditItemAsync(ShoppingItem item) =>
         await Shell.Current.GoToAsync($"additem?listId={item.ListId}&itemId={item.Id}");
+
+    public async Task RenameListAsync(string newName)
+    {
+        await _listService.RenameListAsync(ListId, newName);
+        Title = newName;
+    }
+
+    private void ApplyItemFilter()
+    {
+        var q = SearchQuery?.Trim();
+        var filtered = string.IsNullOrEmpty(q)
+            ? _allItems
+            : _allItems.Where(i => i.Name.Contains(q, StringComparison.OrdinalIgnoreCase)).ToList();
+        RebuildGroups(filtered, _cachedCatNames);
+    }
 
     private void RebuildGroups(List<ShoppingItem> items, Dictionary<int, string> catNames)
     {

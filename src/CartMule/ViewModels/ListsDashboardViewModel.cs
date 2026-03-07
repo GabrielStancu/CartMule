@@ -10,6 +10,9 @@ public sealed class ListSummaryItem
 {
     public ShoppingList List { get; init; } = default!;
     public int ItemCount { get; init; }
+    public string CreatedDisplay =>
+        List.CreatedAt.ToLocalTime().ToString("MMM d");
+
     public string UpdatedDisplay =>
         List.UpdatedAt == default
             ? "New"
@@ -19,14 +22,20 @@ public sealed class ListSummaryItem
 public partial class ListsDashboardViewModel : BaseViewModel
 {
     private readonly IShoppingListService _listService;
+    private readonly List<ListSummaryItem> _allLists = [];
 
-    public ObservableCollection<ListSummaryItem> Lists { get; } = [];
+    public ObservableCollection<ListSummaryItem> FilteredLists { get; } = [];
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(IsNotEmpty))]
     bool _isEmpty = true;
 
     public bool IsNotEmpty => !IsEmpty;
+
+    [ObservableProperty]
+    string _searchQuery = string.Empty;
+
+    partial void OnSearchQueryChanged(string value) => ApplyFilter();
 
     public ListsDashboardViewModel(IShoppingListService listService)
     {
@@ -39,17 +48,16 @@ public partial class ListsDashboardViewModel : BaseViewModel
     {
         if (IsBusy) return;
         IsBusy = true;
-        IsEmpty = false;
         try
         {
             var lists = await _listService.GetAllListsAsync();
-            Lists.Clear();
+            _allLists.Clear();
             foreach (var list in lists)
             {
                 var count = await _listService.GetItemCountAsync(list.Id);
-                Lists.Add(new ListSummaryItem { List = list, ItemCount = count });
+                _allLists.Add(new ListSummaryItem { List = list, ItemCount = count });
             }
-            IsEmpty = Lists.Count == 0;
+            ApplyFilter();
         }
         finally
         {
@@ -63,12 +71,24 @@ public partial class ListsDashboardViewModel : BaseViewModel
         await LoadListsAsync();
     }
 
+    private void ApplyFilter()
+    {
+        FilteredLists.Clear();
+        var q = SearchQuery?.Trim();
+        var source = string.IsNullOrEmpty(q)
+            ? (IEnumerable<ListSummaryItem>)_allLists
+            : _allLists.Where(l => l.List.Name.Contains(q, StringComparison.OrdinalIgnoreCase));
+        foreach (var item in source)
+            FilteredLists.Add(item);
+        IsEmpty = _allLists.Count == 0;
+    }
+
     [RelayCommand]
     async Task DeleteListAsync(ListSummaryItem item)
     {
         await _listService.DeleteListAsync(item.List.Id);
-        Lists.Remove(item);
-        IsEmpty = Lists.Count == 0;
+        _allLists.Remove(item);
+        ApplyFilter();
     }
 
     [RelayCommand]
