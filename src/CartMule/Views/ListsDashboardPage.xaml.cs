@@ -21,15 +21,6 @@ public partial class ListsDashboardPage : ContentPage
 
     private async void OnAddListClicked(object sender, EventArgs e)
     {
-        var name = await DisplayPromptAsync(
-            "New List",
-            "Enter a name for your list",
-            "Create",
-            "Cancel",
-            placeholder: "e.g. Weekly Groceries",
-            maxLength: 60);
-
-        if (string.IsNullOrWhiteSpace(name)) return;
-        await _viewModel.CreateListAsync(name.Trim());
+        await Shell.Current.GoToAsync("addlist?listId=0");
     }
 }

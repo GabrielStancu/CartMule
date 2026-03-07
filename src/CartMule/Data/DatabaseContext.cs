@@ -25,6 +25,7 @@ public class DatabaseContext
         await _connection.CreateTableAsync<ShoppingList>();
         await _connection.CreateTableAsync<ShoppingItem>();
         await SeedCategoriesAsync(_connection);
+        await MigrateAsync(_connection);
 
         return _connection;
     }
@@ -34,5 +35,16 @@ public class DatabaseContext
         var count = await connection.Table<Category>().CountAsync();
         if (count == 0)
             await connection.InsertAllAsync(Category.Defaults);
+    }
+
+    private static async Task MigrateAsync(SQLiteAsyncConnection connection)
+    {
+        // v2: add Shops column to ShoppingList
+        try
+        {
+            await connection.ExecuteAsync(
+                "ALTER TABLE ShoppingList ADD COLUMN Shops TEXT NOT NULL DEFAULT ''");
+        }
+        catch { /* column already exists — safe to ignore */ }
     }
 }

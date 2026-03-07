@@ -83,12 +83,34 @@ public partial class ListsDashboardViewModel : BaseViewModel
         IsEmpty = _allLists.Count == 0;
     }
 
+    private ListSummaryItem? _pendingDeleteList;
+
+    [ObservableProperty]
+    bool _showDeleteListConfirm;
+
     [RelayCommand]
-    async Task DeleteListAsync(ListSummaryItem item)
+    void RequestDeleteList(ListSummaryItem item)
     {
-        await _listService.DeleteListAsync(item.List.Id);
-        _allLists.Remove(item);
+        _pendingDeleteList = item;
+        ShowDeleteListConfirm = true;
+    }
+
+    [RelayCommand]
+    async Task ConfirmDeleteListAsync()
+    {
+        ShowDeleteListConfirm = false;
+        if (_pendingDeleteList is null) return;
+        await _listService.DeleteListAsync(_pendingDeleteList.List.Id);
+        _allLists.Remove(_pendingDeleteList);
+        _pendingDeleteList = null;
         ApplyFilter();
+    }
+
+    [RelayCommand]
+    void CancelDeleteList()
+    {
+        ShowDeleteListConfirm = false;
+        _pendingDeleteList = null;
     }
 
     [RelayCommand]

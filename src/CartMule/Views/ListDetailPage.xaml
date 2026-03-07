@@ -15,6 +15,7 @@
         <converters:StringNotEmptyConverter x:Key="StringNotEmpty" />
     </ContentPage.Resources>
 
+    <Grid>
     <Grid RowDefinitions="{OnPlatform iOS='182,*', Default='154,*'}">
 
         <!-- ── Yellow header (matches dashboard hero height) ─────────── -->
@@ -36,13 +37,21 @@
                     Margin="0,0,0,28"
                     Clicked="OnBackClicked" />
 
-            <Label Grid.Column="1"
-                   Text="{Binding Title}"
-                   Style="{StaticResource PageTitleLabel}"
-                   FontSize="28"
-                   LineBreakMode="TailTruncation"
-                   VerticalOptions="End"
-                   Margin="0,0,0,32" />
+            <VerticalStackLayout Grid.Column="1"
+                                 VerticalOptions="End"
+                                 Spacing="2"
+                                 Margin="0,0,0,32">
+                <Label Text="{Binding Shops}"
+                       FontSize="12"
+                       FontFamily="OpenSansRegular"
+                       TextColor="{StaticResource TextCharcoal}"
+                       Opacity="0.65"
+                       IsVisible="{Binding HasShops}" />
+                <Label Text="{Binding Title}"
+                       Style="{StaticResource PageTitleLabel}"
+                       FontSize="28"
+                       LineBreakMode="TailTruncation" />
+            </VerticalStackLayout>
 
             <Button Grid.Column="2"
                     Text="✏"
@@ -160,12 +169,12 @@
                         </CollectionView.GroupHeaderTemplate>
 
                         <CollectionView.ItemTemplate>
-                            <DataTemplate x:DataType="models:ShoppingItem">
+                            <DataTemplate x:DataType="vm:ShoppingItemViewModel">
                                 <SwipeView>
                                     <SwipeView.RightItems>
                                         <SwipeItems Mode="Execute">
                                             <SwipeItemView WidthRequest="80"
-                                                           Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ListDetailViewModel}}, Path=DeleteItemCommand}"
+                                                           Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ListDetailViewModel}}, Path=RequestDeleteItemCommand}"
                                                            CommandParameter="{Binding}">
                                                 <Border BackgroundColor="{StaticResource DangerRed}"
                                                         StrokeThickness="0"
@@ -192,6 +201,13 @@
                                     </SwipeView.RightItems>
 
                                     <VerticalStackLayout BackgroundColor="White">
+                                        <VerticalStackLayout.Triggers>
+                                            <DataTrigger TargetType="VerticalStackLayout"
+                                                         Binding="{Binding IsDragging}"
+                                                         Value="True">
+                                                <Setter Property="Opacity" Value="0.4" />
+                                            </DataTrigger>
+                                        </VerticalStackLayout.Triggers>
                                         <VerticalStackLayout.GestureRecognizers>
                                             <DropGestureRecognizer
                                                 AllowDrop="True"
@@ -311,7 +327,7 @@
                                                     HorizontalOptions="Center">
                                                 <Border.GestureRecognizers>
                                                     <TapGestureRecognizer
-                                                        Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ListDetailViewModel}}, Path=DeleteItemCommand}"
+                                                        Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ListDetailViewModel}}, Path=RequestDeleteItemCommand}"
                                                         CommandParameter="{Binding}" />
                                                 </Border.GestureRecognizers>
                                                 <Label Text="✕"
@@ -336,6 +352,52 @@
                 </Grid>
             </Grid>
         </Border>
+
+    </Grid>
+
+        <!-- ── Delete item confirmation overlay ─────────────────────── -->
+        <Grid IsVisible="{Binding ShowDeleteItemConfirm}"
+              BackgroundColor="#80000000">
+            <Border HorizontalOptions="Center"
+                    VerticalOptions="Center"
+                    BackgroundColor="White"
+                    StrokeThickness="0"
+                    WidthRequest="300">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="20" />
+                </Border.StrokeShape>
+                <VerticalStackLayout Spacing="0" Padding="24">
+                    <Label Text="Delete item?"
+                           FontSize="18"
+                           FontAttributes="Bold"
+                           FontFamily="OpenSansSemibold"
+                           TextColor="{StaticResource TextCharcoal}"
+                           HorizontalOptions="Center"
+                           Margin="0,0,0,8" />
+                    <Label Text="This item will be permanently removed from the list."
+                           FontSize="14"
+                           FontFamily="OpenSansRegular"
+                           TextColor="{StaticResource SubtleGray}"
+                           HorizontalOptions="Center"
+                           HorizontalTextAlignment="Center"
+                           Margin="0,0,0,24" />
+                    <Button Text="Delete"
+                            BackgroundColor="{StaticResource DangerRed}"
+                            TextColor="White"
+                            FontFamily="OpenSansSemibold"
+                            FontSize="15"
+                            CornerRadius="12"
+                            HeightRequest="48"
+                            HorizontalOptions="Fill"
+                            Command="{Binding ConfirmDeleteItemCommand}"
+                            Margin="0,0,0,10" />
+                    <Button Text="Cancel"
+                            Style="{StaticResource GhostButton}"
+                            HorizontalOptions="Fill"
+                            Command="{Binding CancelDeleteItemCommand}" />
+                </VerticalStackLayout>
+            </Border>
+        </Grid>
 
     </Grid>
 </ContentPage>

@@ -20,10 +20,20 @@ public class ShoppingListService : IShoppingListService
     public Task<ShoppingList?> GetListByIdAsync(int id) =>
         _listRepo.GetByIdAsync(id);
 
-    public Task<ShoppingList> CreateListAsync(string name)
+    public Task<ShoppingList> CreateListAsync(string name, string shops = "")
     {
-        var list = new ShoppingList { Name = name.Trim() };
+        var list = new ShoppingList { Name = name.Trim(), Shops = shops.Trim() };
         return _listRepo.CreateAsync(list);
+    }
+
+    public async Task<ShoppingList> UpdateListAsync(int id, string name, string shops)
+    {
+        var list = await _listRepo.GetByIdAsync(id)
+            ?? throw new InvalidOperationException($"List {id} not found.");
+        list.Name = name.Trim();
+        list.Shops = shops.Trim();
+        list.UpdatedAt = DateTime.UtcNow;
+        return await _listRepo.UpdateAsync(list);
     }
 
     public async Task<ShoppingList> RenameListAsync(int id, string newName)

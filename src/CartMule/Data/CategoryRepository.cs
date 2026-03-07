@@ -26,4 +26,26 @@ public class CategoryRepository : ICategoryRepository
             .Where(c => c.Id == id)
             .FirstOrDefaultAsync();
     }
+
+    public async Task<Category> CreateAsync(Category category)
+    {
+        var conn = await _context.GetConnectionAsync();
+        var existing = await conn.Table<Category>().OrderByDescending(c => c.SortOrder).FirstOrDefaultAsync();
+        category.SortOrder = (existing?.SortOrder ?? 0) + 10;
+        await conn.InsertAsync(category);
+        return category;
+    }
+
+    public async Task<Category> UpdateAsync(Category category)
+    {
+        var conn = await _context.GetConnectionAsync();
+        await conn.UpdateAsync(category);
+        return category;
+    }
+
+    public async Task DeleteAsync(int id)
+    {
+        var conn = await _context.GetConnectionAsync();
+        await conn.DeleteAsync<Category>(id);
+    }
 }

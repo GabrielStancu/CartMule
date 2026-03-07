@@ -6,14 +6,35 @@ using CartMule.Services;
 
 namespace CartMule.ViewModels;
 
-public class ItemGroup : ObservableCollection<ShoppingItem>
+/// <summary>Wraps a ShoppingItem and adds observable drag-state for animation feedback.</summary>
+public partial class ShoppingItemViewModel : ObservableObject
 {
-    public string Name { get; }
-    public bool IsBoughtGroup { get; }
+    public ShoppingItem Source { get; }
 
-    public ItemGroup(string name, bool isBoughtGroup, IEnumerable<ShoppingItem> items) : base(items)
+    [ObservableProperty]
+    bool _isDragging;
+
+    public ShoppingItemViewModel(ShoppingItem source) => Source = source;
+
+    // Forward properties so XAML bindings need no changes
+    public int    Id         => Source.Id;
+    public string Name       => Source.Name;
+    public string Quantity   => Source.Quantity;
+    public bool   IsBought   => Source.IsBought;
+    public int    ListId     => Source.ListId;
+    public int    CategoryId { get => Source.CategoryId; set => Source.CategoryId = value; }
+    public int    SortOrder  { get => Source.SortOrder;  set => Source.SortOrder  = value; }
+}
+
+public class ItemGroup : ObservableCollection<ShoppingItemViewModel>
+{
+    public string Name        { get; }
+    public bool   IsBoughtGroup { get; }
+
+    public ItemGroup(string name, bool isBoughtGroup, IEnumerable<ShoppingItemViewModel> items)
+        : base(items)
     {
-        Name = name;
+        Name         = name;
         IsBoughtGroup = isBoughtGroup;
     }
 }
@@ -23,12 +44,14 @@ public partial class ListDetailViewModel : BaseViewModel
 {
     private readonly IShoppingListService _listService;
     private readonly IShoppingItemService _itemService;
-    private readonly ICategoryService _categoryService;
+    private readonly ICategoryService     _categoryService;
 
-    public ObservableCollection<ItemGroup> Groups { get; } = [];
+    public ObservableCollection<ItemGroup> Groups { get; } = new();
 
-    private List<ShoppingItem> _allItems = [];
-    private Dictionary<int, string> _cachedCatNames = [];
+    private List<ShoppingItemViewModel> _allItemVms = new();
+    private Dictionary<int, string>     _cachedCatNames = new();
+    private ShoppingItemViewModel?      _draggedVm;
+    private ShoppingItemViewModel?      _pendingDeleteVm;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(IsNotEmpty))]
@@ -45,9 +68,16 @@ public partial class ListDetailViewModel : BaseViewModel
     [ObservableProperty]
     string _updatedDisplay = string.Empty;
 
-    partial void OnSearchQueryChanged(string value) => ApplyItemFilter();
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HasShops))]
+    string _shops = string.Empty;
 
-    private ShoppingItem? _draggedItem;
+    public bool HasShops => !string.IsNullOrEmpty(Shops);
+
+    [ObservableProperty]
+    bool _showDeleteItemConfirm;
+
+    partial void OnSearchQueryChanged(string value) => ApplyItemFilter();
 
     public int ListId { get; set; }
 
@@ -56,8 +86,8 @@ public partial class ListDetailViewModel : BaseViewModel
         IShoppingItemService itemService,
         ICategoryService categoryService)
     {
-        _listService = listService;
-        _itemService = itemService;
+        _listService     = listService;
+        _itemService     = itemService;
         _categoryService = categoryService;
     }
 
@@ -69,23 +99,24 @@ public partial class ListDetailViewModel : BaseViewModel
         try
         {
             var list = await _listService.GetListByIdAsync(ListId);
-            Title = list?.Name ?? "List";
+            Title          = list?.Name ?? "List";
+            Shops          = list?.Shops ?? string.Empty;
             UpdatedDisplay = list is not null
                 ? $"Updated {list.UpdatedAt.ToLocalTime():MMM d, H:mm}"
                 : string.Empty;
 
-            var categories = await _categoryService.GetAllCategoriesAsync();
+            var categories  = await _categoryService.GetAllCategoriesAsync();
             _cachedCatNames = categories.ToDictionary(c => c.Id, c => c.Name);
-            _allItems = await _itemService.GetItemsForListAsync(ListId);
+            var items       = await _itemService.GetItemsForListAsync(ListId);
 
-            // Initialise SortOrder on first load if none have been set yet
-            if (_allItems.Count > 1 && _allItems.All(i => i.SortOrder == 0))
+            if (items.Count > 1 && items.All(i => i.SortOrder == 0))
             {
-                for (int i = 0; i < _allItems.Count; i++)
-                    _allItems[i].SortOrder = i + 1;
-                await _itemService.SaveSortOrdersAsync(_allItems);
+                for (int i = 0; i < items.Count; i++)
+                    items[i].SortOrder = i + 1;
+                await _itemService.SaveSortOrdersAsync(items);
             }
 
+            _allItemVms = items.Select(i => new ShoppingItemViewModel(i)).ToList();
             ApplyItemFilter();
         }
         finally
@@ -95,54 +126,37 @@ public partial class ListDetailViewModel : BaseViewModel
     }
 
     [RelayCommand]
-    async Task ToggleBoughtAsync(ShoppingItem item)
+    async Task ToggleBoughtAsync(ShoppingItemViewModel vm)
     {
-        await _itemService.ToggleBoughtAsync(item.Id);
+        await _itemService.ToggleBoughtAsync(vm.Id);
         await LoadItemsAsync();
     }
 
+    // ── Delete item with confirmation modal ──────────────────────────────────
+
     [RelayCommand]
-    async Task DeleteItemAsync(ShoppingItem item)
+    void RequestDeleteItem(ShoppingItemViewModel vm)
     {
-        await _itemService.DeleteItemAsync(item.Id);
-        _allItems.Remove(item);
+        _pendingDeleteVm      = vm;
+        ShowDeleteItemConfirm = true;
+    }
+
+    [RelayCommand]
+    async Task ConfirmDeleteItemAsync()
+    {
+        ShowDeleteItemConfirm = false;
+        if (_pendingDeleteVm is null) return;
+        await _itemService.DeleteItemAsync(_pendingDeleteVm.Id);
+        _allItemVms.Remove(_pendingDeleteVm);
+        _pendingDeleteVm = null;
         ApplyItemFilter();
     }
 
     [RelayCommand]
-    void ItemDragStarted(ShoppingItem item) => _draggedItem = item;
-
-    [RelayCommand]
-    void ItemDragCompleted(ShoppingItem item) => _draggedItem = null;
-
-    [RelayCommand]
-    async Task ItemDropped(ShoppingItem target)
+    void CancelDeleteItem()
     {
-        if (_draggedItem is null || ReferenceEquals(_draggedItem, target))
-        {
-            _draggedItem = null;
-            return;
-        }
-
-        // Change category if dropped into a different group
-        _draggedItem.CategoryId = target.CategoryId;
-
-        // Rebuild order: remove dragged, insert before target
-        var ordered = _allItems.OrderBy(i => i.SortOrder).ToList();
-        ordered.Remove(_draggedItem);
-        var targetIdx = ordered.IndexOf(target);
-        if (targetIdx < 0) targetIdx = ordered.Count;
-        ordered.Insert(targetIdx, _draggedItem);
-
-        for (int i = 0; i < ordered.Count; i++)
-            ordered[i].SortOrder = i + 1;
-
-        await _itemService.SaveSortOrdersAsync(ordered);
-
-        // Reload from service so category-ordering is applied correctly
-        _allItems = await _itemService.GetItemsForListAsync(ListId);
-        _draggedItem = null;
-        ApplyItemFilter();
+        ShowDeleteItemConfirm = false;
+        _pendingDeleteVm      = null;
     }
 
     [RelayCommand]
@@ -153,43 +167,86 @@ public partial class ListDetailViewModel : BaseViewModel
     }
 
     [RelayCommand]
-    static async Task EditItemAsync(ShoppingItem item) =>
-        await Shell.Current.GoToAsync($"additem?listId={item.ListId}&itemId={item.Id}");
+    static async Task EditItemAsync(ShoppingItemViewModel vm) =>
+        await Shell.Current.GoToAsync($"additem?listId={vm.ListId}&itemId={vm.Id}");
 
-    public async Task RenameListAsync(string newName)
+    // ── Drag and drop reorder ────────────────────────────────────────────────
+
+    [RelayCommand]
+    void ItemDragStarted(ShoppingItemViewModel vm)
     {
-        await _listService.RenameListAsync(ListId, newName);
-        Title = newName;
+        if (_draggedVm is not null) _draggedVm.IsDragging = false;
+        _draggedVm = vm;
+        vm.IsDragging = true;
+    }
+
+    [RelayCommand]
+    void ItemDragCompleted(ShoppingItemViewModel vm)
+    {
+        if (_draggedVm is not null) _draggedVm.IsDragging = false;
+        _draggedVm = null;
+    }
+
+    [RelayCommand]
+    async Task ItemDropped(ShoppingItemViewModel target)
+    {
+        if (_draggedVm is null || ReferenceEquals(_draggedVm, target))
+        {
+            if (_draggedVm is not null) _draggedVm.IsDragging = false;
+            _draggedVm = null;
+            return;
+        }
+
+        _draggedVm.IsDragging = false;
+
+        // Cross-category move: inherit target's category
+        _draggedVm.Source.CategoryId = target.Source.CategoryId;
+
+        var ordered = _allItemVms.OrderBy(v => v.SortOrder).ToList();
+        ordered.Remove(_draggedVm);
+        var idx = ordered.IndexOf(target);
+        if (idx < 0) idx = ordered.Count;
+        ordered.Insert(idx, _draggedVm);
+
+        for (int i = 0; i < ordered.Count; i++)
+            ordered[i].SortOrder = i + 1;
+
+        await _itemService.SaveSortOrdersAsync(ordered.Select(v => v.Source));
+
+        var items   = await _itemService.GetItemsForListAsync(ListId);
+        _allItemVms = items.Select(i => new ShoppingItemViewModel(i)).ToList();
+        _draggedVm  = null;
+        ApplyItemFilter();
     }
 
     private void ApplyItemFilter()
     {
         var q = SearchQuery?.Trim();
         var filtered = string.IsNullOrEmpty(q)
-            ? _allItems
-            : _allItems.Where(i => i.Name.Contains(q, StringComparison.OrdinalIgnoreCase)).ToList();
+            ? _allItemVms
+            : _allItemVms
+                .Where(v => v.Source.Name.Contains(q, StringComparison.OrdinalIgnoreCase))
+                .ToList();
         RebuildGroups(filtered, _cachedCatNames);
     }
 
-    private void RebuildGroups(List<ShoppingItem> items, Dictionary<int, string> catNames)
+    private void RebuildGroups(List<ShoppingItemViewModel> items, Dictionary<int, string> catNames)
     {
         Groups.Clear();
 
-        var unbought = items.Where(i => !i.IsBought).ToList();
-        var bought = items.Where(i => i.IsBought).ToList();
+        var unbought = items.Where(v => !v.Source.IsBought).ToList();
+        var bought   = items.Where(v =>  v.Source.IsBought).ToList();
 
-        // Preserve category sort order from the service's sorted flat list
-        foreach (var g in unbought.GroupBy(i => i.CategoryId))
+        foreach (var g in unbought.GroupBy(v => v.Source.CategoryId))
         {
             var name = catNames.GetValueOrDefault(g.Key, "Other");
             Groups.Add(new ItemGroup(name, false, g.ToList()));
         }
 
-        // All bought items land in a single "In Cart" group at the bottom
         if (bought.Count > 0)
             Groups.Add(new ItemGroup("In Cart ✓", true, bought));
 
-        IsEmpty = Groups.Count == 0;
+        IsEmpty       = Groups.Count == 0;
         HasBoughtItems = bought.Count > 0;
     }
 }

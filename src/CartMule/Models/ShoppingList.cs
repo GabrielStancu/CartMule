@@ -14,4 +14,7 @@ public class ShoppingList
 
     /// <summary>Updated whenever any item in this list changes.</summary>
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+
+    /// <summary>Optional comma/semicolon separated shops where this list applies.</summary>
+    public string Shops { get; set; } = string.Empty;
 }

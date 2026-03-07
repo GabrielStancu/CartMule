@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:CartMule.ViewModels"
+             x:Class="CartMule.Views.AddListPage"
+             x:DataType="vm:AddListViewModel"
+             Shell.NavBarIsVisible="False"
+             BackgroundColor="{StaticResource BackgroundGray}">
+
+    <!-- Outer Grid: layers main content + modal overlay -->
+    <Grid>
+
+        <!-- ── Main content ──────────────────────────────────────────────── -->
+        <Grid RowDefinitions="Auto,*">
+
+            <!-- ── Yellow header ─────────────────────────────────────────── -->
+            <Border Grid.Row="0"
+                    BackgroundColor="{StaticResource PrimaryYellow}"
+                    Padding="{OnPlatform iOS='16,52,16,16', Default='16,24,16,16'}"
+                    StrokeThickness="0">
+                <Grid ColumnDefinitions="44,*" ColumnSpacing="8">
+
+                    <Button Grid.Column="0"
+                            Text="←"
+                            TextColor="{StaticResource TextCharcoal}"
+                            BackgroundColor="Transparent"
+                            FontSize="22"
+                            FontFamily="OpenSansRegular"
+                            Padding="0"
+                            WidthRequest="44"
+                            HeightRequest="44"
+                            VerticalOptions="Center"
+                            Command="{Binding CancelCommand}" />
+
+                    <Label Grid.Column="1"
+                           Text="{Binding Title}"
+                           Style="{StaticResource PageTitleLabel}"
+                           VerticalOptions="Center" />
+
+                </Grid>
+            </Border>
+
+            <!-- ── Form area ──────────────────────────────────────────────── -->
+            <ScrollView Grid.Row="1">
+                <VerticalStackLayout Spacing="0" Padding="20,24,20,40">
+
+                    <!-- List name -->
+                    <Label Text="List Name"
+                           TextColor="{StaticResource SubtleGray}"
+                           FontFamily="OpenSansRegular"
+                           FontSize="13"
+                           Margin="4,0,0,6" />
+                    <Border Style="{StaticResource InputBorder}"
+                            Margin="0,0,0,20">
+                        <Entry Text="{Binding Name}"
+                               Style="{StaticResource RoundedInputField}"
+                               Placeholder="e.g. Weekly Groceries"
+                               ReturnType="Next" />
+                    </Border>
+
+                    <!-- Shops (optional) -->
+                    <Label Text="Shops (optional)"
+                           TextColor="{StaticResource SubtleGray}"
+                           FontFamily="OpenSansRegular"
+                           FontSize="13"
+                           Margin="4,0,0,6" />
+                    <Border Style="{StaticResource InputBorder}"
+                            Margin="0,0,0,28">
+                        <Entry Text="{Binding Shops}"
+                               Style="{StaticResource RoundedInputField}"
+                               Placeholder="e.g. Lidl, Aldi"
+                               ReturnType="Done" />
+                    </Border>
+
+                    <!-- Categories heading -->
+                    <Label Text="Categories"
+                           TextColor="{StaticResource SubtleGray}"
+                           FontFamily="OpenSansRegular"
+                           FontSize="13"
+                           Margin="4,0,0,10" />
+
+                    <!-- Category list -->
+                    <CollectionView ItemsSource="{Binding Categories}"
+                                    SelectionMode="None"
+                                    Margin="0,0,0,10">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="vm:CategoryEditItem">
+                                <Border Style="{StaticResource InputBorder}"
+                                        Margin="0,0,0,8">
+                                    <Grid ColumnDefinitions="*,44,44" Padding="16,0">
+
+                                        <Label Grid.Column="0"
+                                               Text="{Binding Name}"
+                                               FontFamily="OpenSansRegular"
+                                               FontSize="15"
+                                               TextColor="{StaticResource TextCharcoal}"
+                                               VerticalOptions="Center" />
+
+                                        <!-- Edit pencil -->
+                                        <Border Grid.Column="1"
+                                                BackgroundColor="Transparent"
+                                                StrokeThickness="0"
+                                                WidthRequest="36"
+                                                HeightRequest="36"
+                                                VerticalOptions="Center"
+                                                HorizontalOptions="Center">
+                                            <Border.GestureRecognizers>
+                                                <TapGestureRecognizer Tapped="OnEditCategoryClicked" />
+                                            </Border.GestureRecognizers>
+                                            <Label Text="✏"
+                                                   TextColor="{StaticResource TextCharcoal}"
+                                                   FontSize="16"
+                                                   HorizontalOptions="Center"
+                                                   VerticalOptions="Center" />
+                                        </Border>
+
+                                        <!-- Delete trash -->
+                                        <Border Grid.Column="2"
+                                                BackgroundColor="Transparent"
+                                                StrokeThickness="0"
+                                                WidthRequest="36"
+                                                HeightRequest="36"
+                                                VerticalOptions="Center"
+                                                HorizontalOptions="Center">
+                                            <Border.GestureRecognizers>
+                                                <TapGestureRecognizer
+                                                    Command="{Binding Source={RelativeSource AncestorType={x:Type vm:AddListViewModel}}, Path=DeleteCategoryCommand}"
+                                                    CommandParameter="{Binding}" />
+                                            </Border.GestureRecognizers>
+                                            <Label Text="🗑"
+                                                   FontSize="16"
+                                                   HorizontalOptions="Center"
+                                                   VerticalOptions="Center" />
+                                        </Border>
+
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+
+                    <!-- Add category row -->
+                    <Border Style="{StaticResource InputBorder}"
+                            Margin="0,0,0,20">
+                        <Grid ColumnDefinitions="*,52" Padding="0,0,8,0">
+                            <Entry Grid.Column="0"
+                                   Text="{Binding NewCategoryName}"
+                                   Style="{StaticResource RoundedInputField}"
+                                   Placeholder="New category name"
+                                   ReturnType="Done"
+                                   ReturnCommand="{Binding AddCategoryCommand}" />
+                            <Button Grid.Column="1"
+                                    Text="+"
+                                    Style="{StaticResource FABButton}"
+                                    WidthRequest="40"
+                                    HeightRequest="40"
+                                    CornerRadius="20"
+                                    FontSize="20"
+                                    VerticalOptions="Center"
+                                    HorizontalOptions="Center"
+                                    Command="{Binding AddCategoryCommand}" />
+                        </Grid>
+                    </Border>
+
+                    <!-- Save -->
+                    <Button Text="Save"
+                            BackgroundColor="{StaticResource PrimaryYellow}"
+                            TextColor="{StaticResource TextCharcoal}"
+                            FontFamily="OpenSansSemibold"
+                            FontSize="16"
+                            CornerRadius="14"
+                            HeightRequest="52"
+                            HorizontalOptions="Fill"
+                            Command="{Binding SaveCommand}"
+                            Margin="0,0,0,12" />
+
+                    <!-- Cancel (create mode only) -->
+                    <Button Text="Cancel"
+                            Style="{StaticResource GhostButton}"
+                            HorizontalOptions="Fill"
+                            IsVisible="{Binding IsCreateMode}"
+                            Command="{Binding CancelCommand}"
+                            Margin="0,0,0,12" />
+
+                    <!-- Delete list (edit mode only) -->
+                    <Button Text="Delete List"
+                            BackgroundColor="{StaticResource DangerRed}"
+                            TextColor="White"
+                            FontFamily="OpenSansSemibold"
+                            FontSize="15"
+                            CornerRadius="14"
+                            HeightRequest="52"
+                            HorizontalOptions="Fill"
+                            IsVisible="{Binding IsEditMode}"
+                            Command="{Binding RequestDeleteListCommand}" />
+
+                </VerticalStackLayout>
+            </ScrollView>
+
+        </Grid>
+
+        <!-- ── Delete list confirmation overlay ─────────────────────────── -->
+        <Grid IsVisible="{Binding ShowDeleteListConfirm}"
+              BackgroundColor="#80000000">
+            <Border HorizontalOptions="Center"
+                    VerticalOptions="Center"
+                    BackgroundColor="White"
+                    StrokeThickness="0"
+                    WidthRequest="300">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="20" />
+                </Border.StrokeShape>
+                <VerticalStackLayout Spacing="0" Padding="24">
+                    <Label Text="Delete this list?"
+                           FontSize="18"
+                           FontAttributes="Bold"
+                           FontFamily="OpenSansSemibold"
+                           TextColor="{StaticResource TextCharcoal}"
+                           HorizontalOptions="Center"
+                           Margin="0,0,0,8" />
+                    <Label Text="All items in this list will also be permanently deleted."
+                           FontSize="14"
+                           FontFamily="OpenSansRegular"
+                           TextColor="{StaticResource SubtleGray}"
+                           HorizontalOptions="Center"
+                           HorizontalTextAlignment="Center"
+                           Margin="0,0,0,24" />
+                    <Button Text="Delete"
+                            BackgroundColor="{StaticResource DangerRed}"
+                            TextColor="White"
+                            FontFamily="OpenSansSemibold"
+                            FontSize="15"
+                            CornerRadius="12"
+                            HeightRequest="48"
+                            HorizontalOptions="Fill"
+                            Command="{Binding ConfirmDeleteListCommand}"
+                            Margin="0,0,0,10" />
+                    <Button Text="Cancel"
+                            Style="{StaticResource GhostButton}"
+                            HorizontalOptions="Fill"
+                            Command="{Binding CancelDeleteListCommand}" />
+                </VerticalStackLayout>
+            </Border>
+        </Grid>
+
+    </Grid>
+</ContentPage>

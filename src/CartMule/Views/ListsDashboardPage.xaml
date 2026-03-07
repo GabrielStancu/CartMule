@@ -7,6 +7,7 @@
              Shell.NavBarIsVisible="False"
              BackgroundColor="{StaticResource PrimaryYellow}">
 
+    <Grid>
     <Grid RowDefinitions="Auto,*">
 
         <!-- ── Hero header ───────────────────────────────────────────── -->
@@ -124,7 +125,7 @@
                                 <SwipeView.RightItems>
                                     <SwipeItems Mode="Execute">
                                         <SwipeItemView WidthRequest="80"
-                                                       Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ListsDashboardViewModel}}, Path=DeleteListCommand}"
+                                                       Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ListsDashboardViewModel}}, Path=RequestDeleteListCommand}"
                                                        CommandParameter="{Binding}">
                                             <Border BackgroundColor="{StaticResource DangerRed}"
                                                     StrokeThickness="0"
@@ -201,6 +202,52 @@
 
             </Grid>
         </Border>
+
+    </Grid>
+
+        <!-- ── Delete list confirmation overlay ──────────────────── -->
+        <Grid IsVisible="{Binding ShowDeleteListConfirm}"
+              BackgroundColor="#80000000">
+            <Border HorizontalOptions="Center"
+                    VerticalOptions="Center"
+                    BackgroundColor="White"
+                    StrokeThickness="0"
+                    WidthRequest="300">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="20" />
+                </Border.StrokeShape>
+                <VerticalStackLayout Spacing="0" Padding="24">
+                    <Label Text="Delete this list?"
+                           FontSize="18"
+                           FontAttributes="Bold"
+                           FontFamily="OpenSansSemibold"
+                           TextColor="{StaticResource TextCharcoal}"
+                           HorizontalOptions="Center"
+                           Margin="0,0,0,8" />
+                    <Label Text="All items in this list will also be permanently deleted."
+                           FontSize="14"
+                           FontFamily="OpenSansRegular"
+                           TextColor="{StaticResource SubtleGray}"
+                           HorizontalOptions="Center"
+                           HorizontalTextAlignment="Center"
+                           Margin="0,0,0,24" />
+                    <Button Text="Delete"
+                            BackgroundColor="{StaticResource DangerRed}"
+                            TextColor="White"
+                            FontFamily="OpenSansSemibold"
+                            FontSize="15"
+                            CornerRadius="12"
+                            HeightRequest="48"
+                            HorizontalOptions="Fill"
+                            Command="{Binding ConfirmDeleteListCommand}"
+                            Margin="0,0,0,10" />
+                    <Button Text="Cancel"
+                            Style="{StaticResource GhostButton}"
+                            HorizontalOptions="Fill"
+                            Command="{Binding CancelDeleteListCommand}" />
+                </VerticalStackLayout>
+            </Border>
+        </Grid>
 
     </Grid>
 </ContentPage>
