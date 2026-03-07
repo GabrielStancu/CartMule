@@ -102,6 +102,10 @@
                                     <TapGestureRecognizer
                                         Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ListDetailViewModel}}, Path=ToggleBoughtCommand}"
                                         CommandParameter="{Binding}" />
+                                    <TapGestureRecognizer
+                                        NumberOfTapsRequired="2"
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ListDetailViewModel}}, Path=EditItemCommand}"
+                                        CommandParameter="{Binding}" />
                                 </Border.GestureRecognizers>
 
                                 <Grid ColumnDefinitions="24,*"

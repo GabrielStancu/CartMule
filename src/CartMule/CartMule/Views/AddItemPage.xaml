@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:CartMule.ViewModels"
+             x:Class="CartMule.Views.AddItemPage"
+             x:DataType="vm:AddItemViewModel"
+             Shell.NavBarIsVisible="False"
+             BackgroundColor="{StaticResource BackgroundGray}">
+
+    <Grid RowDefinitions="Auto,*">
+
+        <!-- ── Yellow header ─────────────────────────────────────────── -->
+        <Border Grid.Row="0"
+                BackgroundColor="{StaticResource PrimaryYellow}"
+                Padding="16,52,16,16"
+                StrokeThickness="0">
+            <Grid ColumnDefinitions="44,*,Auto" ColumnSpacing="8">
+
+                <Button Grid.Column="0"
+                        Text="←"
+                        TextColor="{StaticResource TextCharcoal}"
+                        BackgroundColor="Transparent"
+                        FontSize="22"
+                        FontFamily="OpenSansRegular"
+                        Padding="0"
+                        WidthRequest="44"
+                        HeightRequest="44"
+                        VerticalOptions="Center"
+                        Command="{Binding CancelCommand}" />
+
+                <Label Grid.Column="1"
+                       Text="{Binding Title}"
+                       Style="{StaticResource PageTitleLabel}"
+                       VerticalOptions="Center" />
+
+            </Grid>
+        </Border>
+
+        <!-- ── Form area ─────────────────────────────────────────────── -->
+        <ScrollView Grid.Row="1">
+            <VerticalStackLayout Spacing="0" Padding="20,24,20,40">
+
+                <!-- Item name -->
+                <Label Text="Item Name"
+                       TextColor="{StaticResource SubtleGray}"
+                       FontFamily="OpenSansRegular"
+                       FontSize="13"
+                       Margin="4,0,0,6" />
+                <Border Style="{StaticResource InputBorder}"
+                        Margin="0,0,0,20">
+                    <Entry Text="{Binding Name}"
+                           Style="{StaticResource RoundedInputField}"
+                           Placeholder="e.g. Whole milk"
+                           ReturnType="Next" />
+                </Border>
+
+                <!-- Quantity -->
+                <Label Text="Quantity (optional)"
+                       TextColor="{StaticResource SubtleGray}"
+                       FontFamily="OpenSansRegular"
+                       FontSize="13"
+                       Margin="4,0,0,6" />
+                <Border Style="{StaticResource InputBorder}"
+                        Margin="0,0,0,20">
+                    <Entry Text="{Binding Quantity}"
+                           Style="{StaticResource RoundedInputField}"
+                           Placeholder="e.g. 2 litres"
+                           ReturnType="Done" />
+                </Border>
+
+                <!-- Category -->
+                <Label Text="Category"
+                       TextColor="{StaticResource SubtleGray}"
+                       FontFamily="OpenSansRegular"
+                       FontSize="13"
+                       Margin="4,0,0,6" />
+                <Border Style="{StaticResource InputBorder}"
+                        Margin="0,0,0,32">
+                    <Picker ItemsSource="{Binding Categories}"
+                            SelectedItem="{Binding SelectedCategory}"
+                            Style="{StaticResource RoundedPicker}"
+                            ItemDisplayBinding="{Binding Name}" />
+                </Border>
+
+                <!-- Save button -->
+                <Button Text="Save"
+                        BackgroundColor="{StaticResource PrimaryYellow}"
+                        TextColor="{StaticResource TextCharcoal}"
+                        FontFamily="OpenSansSemibold"
+                        FontSize="16"
+                        CornerRadius="14"
+                        HeightRequest="52"
+                        HorizontalOptions="Fill"
+                        Command="{Binding SaveCommand}"
+                        Margin="0,0,0,12" />
+
+                <!-- Cancel -->
+                <Button Text="Cancel"
+                        Style="{StaticResource GhostButton}"
+                        HorizontalOptions="Fill"
+                        Command="{Binding CancelCommand}" />
+
+            </VerticalStackLayout>
+        </ScrollView>
+
+    </Grid>
+</ContentPage>

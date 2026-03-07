@@ -65,6 +65,13 @@
 
 ---
 
+### 2026-03-07: Chunk 5 — AddItemViewModel
+**By:** Zoe (Backend Dev)
+**What:** AddItemViewModel with dual QueryProperty (listId + itemId). Add mode: creates new item. Edit mode (itemId > 0): pre-populates fields and updates existing. SaveCommand guarded by CanSave (name required). InitialiseCommand loads categories and pre-populates if edit mode.
+**Why:** Single VM handles both add and edit to avoid code duplication. InitialiseCommand called from OnNavigatedTo (not OnAppearing) to avoid re-population on back-nav.
+
+---
+
 ## Governance
 
 - All meaningful architectural changes require Mal's approval before implementation

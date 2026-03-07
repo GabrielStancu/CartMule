@@ -38,10 +38,12 @@ public static class MauiProgram
         // ── ViewModels ───────────────────────────────────────────────────────
         builder.Services.AddTransient<ListsDashboardViewModel>();
         builder.Services.AddTransient<ListDetailViewModel>();
+        builder.Services.AddTransient<AddItemViewModel>();
 
         // ── Pages ────────────────────────────────────────────────────────────
         builder.Services.AddTransient<ListsDashboardPage>();
         builder.Services.AddTransient<ListDetailPage>();
+        builder.Services.AddTransient<AddItemPage>();
 
 #if DEBUG
         builder.Logging.AddDebug();

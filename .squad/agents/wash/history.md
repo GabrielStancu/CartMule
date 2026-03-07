@@ -36,6 +36,14 @@
 
 *(Append new learnings here as work progresses)*
 
+### Chunk 5 — Route + DI + Edit Nav (2026-03-07)
+- AppShell.xaml.cs: Routing.RegisterRoute("additem", typeof(AddItemPage)) added alongside listdetail
+- MauiProgram.cs: AddItemViewModel + AddItemPage both AddTransient
+- ListDetailPage.xaml: double-tap gesture → EditItemCommand with item as CommandParameter
+- ListDetailViewModel: EditItemAsync navigates GoToAsync("additem?listId=...&itemId=...") 
+- Both listId and itemId passed as query params; AddItemViewModel's QueryProperty handles them
+- CartMule is now feature-complete: all 5 chunks done
+
 ### Chunk 4 — Route + DI + Navigation (2026-03-07)
 - AppShell.xaml.cs: Routing.RegisterRoute("listdetail", typeof(ListDetailPage)) — must be called in constructor before any navigation
 - MauiProgram.cs: ListDetailViewModel + ListDetailPage both AddTransient (fresh instance on each navigation)

@@ -100,6 +100,10 @@ public partial class ListDetailViewModel : BaseViewModel
         await LoadItemsAsync();
     }
 
+    [RelayCommand]
+    static async Task EditItemAsync(ShoppingItem item) =>
+        await Shell.Current.GoToAsync($"additem?listId={item.ListId}&itemId={item.Id}");
+
     private void RebuildGroups(List<ShoppingItem> items, Dictionary<int, string> catNames)
     {
         Groups.Clear();

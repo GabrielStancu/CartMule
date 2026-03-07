@@ -73,3 +73,11 @@
 - ToggleBoughtCommand and DeleteItemCommand bound via RelativeSource AncestorType on ListDetailViewModel (same XC0025 warning as dashboard — harmless)
 - OnAddItemClicked navigates to "additem?listId=..." — stub route for Chunk 5
 - StringNotEmptyConverter: IValueConverter returning true when string is not null/whitespace — hides empty quantity labels
+
+### Chunk 5 — AddItemPage (2026-03-07)
+- OnNavigatedTo (not OnAppearing) triggers InitialiseCommand — prevents re-population when returning from a future sub-nav
+- CancelCommand bound to both back arrow and Cancel button (no code-behind needed for those)
+- Picker uses ItemDisplayBinding="{Binding Name}" — no custom ItemTemplate required
+- Form wrapped in ScrollView so keyboard doesn't clip input on small screens
+- No FAB on this page; Save is a prominent full-width yellow button at the bottom of the form
+- RoundedPicker and RoundedInputField styles already defined in Styles.xaml

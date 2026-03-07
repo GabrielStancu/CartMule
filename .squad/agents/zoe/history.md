@@ -82,3 +82,12 @@
 - IsEmpty/IsNotEmpty: controlled in RebuildGroups and DeleteItemAsync
 - DeleteItemAsync removes locally (no full reload) and cleans up empty groups
 - ToggleBoughtAsync and UncheckAllAsync do a full LoadItemsAsync reload to re-sort correctly
+
+### Chunk 5 — AddItemViewModel (2026-03-07)
+- Two QueryProperty: "listId" → ListId (int), "itemId" → ItemId (int; 0 means add mode)
+- IsEditMode = ItemId > 0 (computed, no ObservableProperty needed — value is stable after navigation)
+- InitialiseCommand: loads categories, pre-populates fields in edit mode, sets default category to "Other" in add mode
+- SaveCommand has CanExecute guarded by CanSave() = !IsNullOrWhiteSpace(Name); NotifyCanExecuteChangedFor fires on Name changes
+- In edit mode, SaveAsync fetches the live item from service (to avoid stale state), patches fields, then UpdateItemAsync
+- CancelCommand is a static relay command (no instance state needed)
+- CategoryId fallback: 8 (Other) if SelectedCategory is null
