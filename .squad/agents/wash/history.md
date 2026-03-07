@@ -36,6 +36,12 @@
 
 *(Append new learnings here as work progresses)*
 
+### Chunk 2 — DI wiring (2026-03-07)
+- MauiProgram.cs updated with full DI registrations
+- Registration order: DatabaseContext (singleton, direct instance) → Repositories → Services
+- All repos + services registered as Singleton (DB connection is also singleton — safe)
+- No ViewModels or Pages registered yet — that is Chunk 3
+
 ### 2026-03-07 — Chunk 1: Foundation
 - Added NuGet packages: sqlite-net-pcl 1.9.172, SQLitePCLRaw.bundle_green 2.1.10, CommunityToolkit.Mvvm 8.3.2 to CartMule.csproj in a separate ItemGroup.
 - Created ViewModels/BaseViewModel.cs using ObservableObject partial pattern with IsBusy/IsNotBusy/Title properties.

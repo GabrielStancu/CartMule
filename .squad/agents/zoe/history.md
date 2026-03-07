@@ -53,3 +53,15 @@
 - `[Indexed]` on `ShoppingItem.ListId` for fast per-list queries.
 
 **Sorting rule reminder:** IsBought ASC → Category.SortOrder ASC → ShoppingItem.SortOrder ASC.
+
+## Learnings
+
+### Chunk 2 — Data Layer (2026-03-07)
+- DatabaseContext: lazy async init via GetConnectionAsync(); seeds Category.Defaults on empty table
+- IListRepository/ListRepository: full CRUD + ordered by UpdatedAt desc
+- IItemRepository/ItemRepository: includes DeleteByListIdAsync (raw SQL) and GetCountByListIdAsync
+- ICategoryRepository/CategoryRepository: read-only, sorted by SortOrder
+- IShoppingListService/ShoppingListService: Create/Rename/Delete (cascades items) /Touch/GetItemCount
+- IShoppingItemService/ShoppingItemService: GetItemsForListAsync sorts IsBought ASC → catSortOrder ASC → SortOrder ASC
+- ToggleBoughtAsync and UncheckAllAsync both call TouchListAsync to keep UpdatedAt current
+- ICategoryService/CategoryService: thin wrapper over ICategoryRepository for VM consumption

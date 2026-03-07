@@ -44,6 +44,13 @@
 
 ---
 
+### 2026-03-07: Chunk 2 — Data Layer complete
+**By:** Zoe (Backend Dev)
+**What:** DatabaseContext with lazy async init and category seeding. Full repository layer (IListRepository, IItemRepository, ICategoryRepository). Full service layer (IShoppingListService, IShoppingItemService, ICategoryService). Sorting rule implemented in ShoppingItemService.GetItemsForListAsync: IsBought ASC → Category.SortOrder ASC → ShoppingItem.SortOrder ASC.
+**Why:** Foundation for ViewModels in Chunk 3+.
+
+---
+
 ## Governance
 
 - All meaningful architectural changes require Mal's approval before implementation
