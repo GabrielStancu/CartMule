@@ -1,0 +1,53 @@
+{
+  "version": "1.0.0",
+  "agents": [
+    {
+      "persistent_name": "Wash",
+      "universe": "firefly",
+      "role": "Tech Lead",
+      "created_at": "2026-03-07T00:00:00Z",
+      "legacy_named": false,
+      "status": "active"
+    },
+    {
+      "persistent_name": "Mal",
+      "universe": "firefly",
+      "role": "Lead & Architect",
+      "created_at": "2026-03-07T00:00:00Z",
+      "legacy_named": false,
+      "status": "active"
+    },
+    {
+      "persistent_name": "Kaylee",
+      "universe": "firefly",
+      "role": "UI Dev",
+      "created_at": "2026-03-07T00:00:00Z",
+      "legacy_named": false,
+      "status": "active"
+    },
+    {
+      "persistent_name": "Zoe",
+      "universe": "firefly",
+      "role": "Backend Dev",
+      "created_at": "2026-03-07T00:00:00Z",
+      "legacy_named": false,
+      "status": "active"
+    },
+    {
+      "persistent_name": "Scribe",
+      "universe": "exempt",
+      "role": "Session Logger",
+      "created_at": "2026-03-07T00:00:00Z",
+      "legacy_named": false,
+      "status": "active"
+    },
+    {
+      "persistent_name": "Ralph",
+      "universe": "exempt",
+      "role": "Work Monitor",
+      "created_at": "2026-03-07T00:00:00Z",
+      "legacy_named": false,
+      "status": "active"
+    }
+  ]
+}

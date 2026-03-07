@@ -1,0 +1,14 @@
+{
+  "version": "1.0.0",
+  "universeAllowlist": ["firefly"],
+  "maxAgentsPerAssignment": 10,
+  "allowOverflow": true,
+  "overflowStrategy": "diegetic-expansion",
+  "exemptNames": ["Scribe", "Ralph", "@copilot"],
+  "scoringWeights": {
+    "size_fit": 0.3,
+    "shape_fit": 0.4,
+    "resonance_fit": 0.2,
+    "lru_penalty": 0.1
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "version": "1.0.0",
+  "assignments": [
+    {
+      "assignment_id": "cartmule-init-2026-03-07",
+      "project": "CartMule",
+      "universe": "firefly",
+      "created_at": "2026-03-07T00:00:00Z",
+      "agents": [
+        { "persistent_name": "Mal", "role": "Lead & Architect" },
+        { "persistent_name": "Kaylee", "role": "UI Dev" },
+        { "persistent_name": "Zoe", "role": "Backend Dev" }
+      ]
+    }
+  ]
+}
