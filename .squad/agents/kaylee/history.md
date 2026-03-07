@@ -56,3 +56,11 @@
   - `BoolToOpacityConverter` — `true` → `0.45` (dimmed/bought), `false` → `1.0` (active)
 - Color keys: `PrimaryYellow` (#FFD200), `TextCharcoal` (#1A1A1A), `SubtleGray` (#757575), `LightGray` (#E8E8E8), `Surface` (#FFFFFF), `Background` (#F7F7F7), `DangerRed` (#FF3B30), `SuccessGreen` (#34C759)
 - Corner radii: cards=20, inputs=14, FAB=28
+
+### Chunk 3 — ListsDashboardPage (2026-03-07)
+- Shell.NavBarIsVisible="False" — we own the header bar (yellow Border with Padding 20,52,20,20 for status bar)
+- CollectionView Margin bottom 90 so FAB doesn't overlap last card
+- SwipeView RightItems Mode="Execute" for delete swipe
+- TapGestureRecognizer on card Border binds to OpenListCommand via RelativeSource AncestorType
+- FAB uses Clicked event (code-behind) so DisplayPromptAsync can collect the list name
+- x:DataType="vm:ListSummaryItem" on DataTemplate for compiled bindings; type lives in CartMule.ViewModels namespace

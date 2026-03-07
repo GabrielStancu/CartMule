@@ -36,6 +36,12 @@
 
 *(Append new learnings here as work progresses)*
 
+### Chunk 3 — DI wiring + AppShell (2026-03-07)
+- ListsDashboardViewModel and ListsDashboardPage registered as Transient (pages should be Transient for correct lifetime)
+- AppShell simplified to single ShellContent pointing to ListsDashboardPage, Route="lists"
+- Shell.NavBarIsVisible="False" on AppShell so the page controls its own header
+- using CartMule.ViewModels + CartMule.Views added to MauiProgram.cs
+
 ### Chunk 2 — DI wiring (2026-03-07)
 - MauiProgram.cs updated with full DI registrations
 - Registration order: DatabaseContext (singleton, direct instance) → Repositories → Services

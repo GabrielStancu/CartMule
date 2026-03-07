@@ -1,6 +1,8 @@
 ﻿using Microsoft.Extensions.Logging;
 using CartMule.Data;
 using CartMule.Services;
+using CartMule.ViewModels;
+using CartMule.Views;
 
 namespace CartMule;
 
@@ -32,6 +34,12 @@ public static class MauiProgram
         builder.Services.AddSingleton<IShoppingListService, ShoppingListService>();
         builder.Services.AddSingleton<IShoppingItemService, ShoppingItemService>();
         builder.Services.AddSingleton<ICategoryService, CategoryService>();
+
+        // ── ViewModels ───────────────────────────────────────────────────────
+        builder.Services.AddTransient<ListsDashboardViewModel>();
+
+        // ── Pages ────────────────────────────────────────────────────────────
+        builder.Services.AddTransient<ListsDashboardPage>();
 
 #if DEBUG
         builder.Logging.AddDebug();

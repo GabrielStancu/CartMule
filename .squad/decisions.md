@@ -51,6 +51,13 @@
 
 ---
 
+### 2026-03-07: Chunk 3 — ListsDashboardViewModel
+**By:** Zoe (Backend Dev)
+**What:** ListSummaryItem display DTO + ListsDashboardViewModel with LoadListsCommand, CreateListAsync, DeleteListCommand, OpenListCommand. OpenListCommand is a placeholder stub for Chunk 4.
+**Why:** Dashboard requires per-item count which requires an N+1 call per list — acceptable since list count is expected to be small.
+
+---
+
 ## Governance
 
 - All meaningful architectural changes require Mal's approval before implementation

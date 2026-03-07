@@ -65,3 +65,12 @@
 - IShoppingItemService/ShoppingItemService: GetItemsForListAsync sorts IsBought ASC → catSortOrder ASC → SortOrder ASC
 - ToggleBoughtAsync and UncheckAllAsync both call TouchListAsync to keep UpdatedAt current
 - ICategoryService/CategoryService: thin wrapper over ICategoryRepository for VM consumption
+
+### Chunk 3 — ListsDashboardViewModel (2026-03-07)
+- ListSummaryItem is a display DTO (public sealed class) defined alongside the ViewModel in ViewModels/
+- ObservableCollection<ListSummaryItem> is not ObservableProperty — mutated directly (Clear/Add/Remove)
+- IsEmpty is ObservableProperty; IsNotEmpty is computed via NotifyPropertyChangedFor
+- LoadListsAsync uses IsBusy guard; sets IsEmpty=false at start to hide empty state during load
+- CreateListAsync is a plain public async method called from page code-behind after DisplayPromptAsync
+- DeleteListAsync removes from the in-memory collection immediately (no full reload needed)
+- OpenListCommand is a placeholder stub for Chunk 4 navigation
