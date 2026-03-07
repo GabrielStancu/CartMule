@@ -36,6 +36,12 @@
 
 *(Append new learnings here as work progresses)*
 
+### Chunk 4 — Route + DI + Navigation (2026-03-07)
+- AppShell.xaml.cs: Routing.RegisterRoute("listdetail", typeof(ListDetailPage)) — must be called in constructor before any navigation
+- MauiProgram.cs: ListDetailViewModel + ListDetailPage both AddTransient (fresh instance on each navigation)
+- ListsDashboardViewModel.OpenListAsync: GoToAsync("listdetail?id={id}") — Shell QueryProperty "id" feeds ListDetailViewModel.ListId
+- Additem route ("additem?listId=...") is NOT registered yet — that is Chunk 5
+
 ### Chunk 3 — DI wiring + AppShell (2026-03-07)
 - ListsDashboardViewModel and ListsDashboardPage registered as Transient (pages should be Transient for correct lifetime)
 - AppShell simplified to single ShellContent pointing to ListsDashboardPage, Route="lists"

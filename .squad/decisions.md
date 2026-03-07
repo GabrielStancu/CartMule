@@ -58,6 +58,13 @@
 
 ---
 
+### 2026-03-07: Chunk 4 — ListDetailViewModel
+**By:** Zoe (Backend Dev)
+**What:** ItemGroup (ObservableCollection<ShoppingItem> subclass) + ListDetailViewModel with LoadItemsCommand, ToggleBoughtCommand, DeleteItemCommand, UncheckAllCommand. Items grouped: unbought by category, bought → single "In Cart ✓" group at bottom. QueryProperty("id") feeds ListId from Shell navigation.
+**Why:** Grouping pattern chosen to clearly show shopping progress; "In Cart" bucket gives user visual confirmation of what's already in the cart.
+
+---
+
 ## Governance
 
 - All meaningful architectural changes require Mal's approval before implementation

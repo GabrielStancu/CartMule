@@ -74,3 +74,11 @@
 - CreateListAsync is a plain public async method called from page code-behind after DisplayPromptAsync
 - DeleteListAsync removes from the in-memory collection immediately (no full reload needed)
 - OpenListCommand is a placeholder stub for Chunk 4 navigation
+
+### Chunk 4 — ListDetailViewModel (2026-03-07)
+- ItemGroup : ObservableCollection<ShoppingItem> with Name + IsBoughtGroup; defined in same file as ViewModel
+- [QueryProperty(nameof(ListId), "id")] — Shell sets ListId after construction; LoadItemsCommand triggered from OnAppearing
+- RebuildGroups: unbought items grouped by CategoryId (service sort order preserved), all bought items → single "In Cart ✓" group at bottom
+- IsEmpty/IsNotEmpty: controlled in RebuildGroups and DeleteItemAsync
+- DeleteItemAsync removes locally (no full reload) and cleans up empty groups
+- ToggleBoughtAsync and UncheckAllAsync do a full LoadItemsAsync reload to re-sort correctly

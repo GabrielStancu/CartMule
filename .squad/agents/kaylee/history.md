@@ -64,3 +64,12 @@
 - TapGestureRecognizer on card Border binds to OpenListCommand via RelativeSource AncestorType
 - FAB uses Clicked event (code-behind) so DisplayPromptAsync can collect the list name
 - x:DataType="vm:ListSummaryItem" on DataTemplate for compiled bindings; type lives in CartMule.ViewModels namespace
+
+### Chunk 4 — ListDetailPage (2026-03-07)
+- Page declares converters in ContentPage.Resources (BoolToTextDecoration, BoolToOpacity, StringNotEmpty)
+- xmlns:models="clr-namespace:CartMule.Models" needed for x:DataType on item DataTemplate
+- Grouped CollectionView: GroupHeaderTemplate uses x:DataType="vm:ItemGroup", ItemTemplate uses x:DataType="models:ShoppingItem"
+- Circle checkbox: Border with Ellipse StrokeShape, DataTrigger fills it dark when IsBought=true
+- ToggleBoughtCommand and DeleteItemCommand bound via RelativeSource AncestorType on ListDetailViewModel (same XC0025 warning as dashboard — harmless)
+- OnAddItemClicked navigates to "additem?listId=..." — stub route for Chunk 5
+- StringNotEmptyConverter: IValueConverter returning true when string is not null/whitespace — hides empty quantity labels

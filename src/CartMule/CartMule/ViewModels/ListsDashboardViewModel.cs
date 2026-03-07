@@ -74,7 +74,6 @@ public partial class ListsDashboardViewModel : BaseViewModel
     [RelayCommand]
     async Task OpenListAsync(ListSummaryItem item)
     {
-        // Chunk 4: await Shell.Current.GoToAsync($"listdetail?id={item.List.Id}");
-        await Task.CompletedTask;
+        await Shell.Current.GoToAsync($"listdetail?id={item.List.Id}");
     }
 }

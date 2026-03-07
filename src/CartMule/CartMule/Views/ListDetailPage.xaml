@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:CartMule.ViewModels"
+             xmlns:models="clr-namespace:CartMule.Models"
+             xmlns:converters="clr-namespace:CartMule.Converters"
+             x:Class="CartMule.Views.ListDetailPage"
+             x:DataType="vm:ListDetailViewModel"
+             Shell.NavBarIsVisible="False"
+             BackgroundColor="{StaticResource BackgroundGray}">
+
+    <ContentPage.Resources>
+        <converters:BoolToTextDecorationConverter x:Key="BoolToTextDecoration" />
+        <converters:BoolToOpacityConverter x:Key="BoolToOpacity" />
+        <converters:StringNotEmptyConverter x:Key="StringNotEmpty" />
+    </ContentPage.Resources>
+
+    <Grid RowDefinitions="Auto,*">
+
+        <!-- ── Yellow header ─────────────────────────────────────────── -->
+        <Border Grid.Row="0"
+                BackgroundColor="{StaticResource PrimaryYellow}"
+                Padding="16,52,16,16"
+                StrokeThickness="0">
+            <Grid ColumnDefinitions="44,*,Auto" ColumnSpacing="8">
+
+                <Button Grid.Column="0"
+                        Text="←"
+                        TextColor="{StaticResource TextCharcoal}"
+                        BackgroundColor="Transparent"
+                        FontSize="22"
+                        FontFamily="OpenSansRegular"
+                        Padding="0"
+                        WidthRequest="44"
+                        HeightRequest="44"
+                        VerticalOptions="Center"
+                        Clicked="OnBackClicked" />
+
+                <Label Grid.Column="1"
+                       Text="{Binding Title}"
+                       Style="{StaticResource PageTitleLabel}"
+                       VerticalOptions="Center" />
+
+                <Button Grid.Column="2"
+                        Text="Uncheck All"
+                        Style="{StaticResource GhostButton}"
+                        IsVisible="{Binding HasBoughtItems}"
+                        Command="{Binding UncheckAllCommand}"
+                        VerticalOptions="Center" />
+            </Grid>
+        </Border>
+
+        <!-- ── Content area ──────────────────────────────────────────── -->
+        <Grid Grid.Row="1">
+
+            <!-- Empty state -->
+            <VerticalStackLayout IsVisible="{Binding IsEmpty}"
+                                 VerticalOptions="Center"
+                                 HorizontalOptions="Center"
+                                 Spacing="8"
+                                 Padding="32">
+                <Label Text="No items yet"
+                       Style="{StaticResource SectionSubtitleLabel}"
+                       HorizontalOptions="Center" />
+                <Label Text="Tap + to add your first item"
+                       HorizontalOptions="Center"
+                       TextColor="{StaticResource SubtleGray}"
+                       FontFamily="OpenSansRegular"
+                       FontSize="15" />
+            </VerticalStackLayout>
+
+            <!-- Grouped items list -->
+            <CollectionView ItemsSource="{Binding Groups}"
+                            IsGrouped="True"
+                            IsVisible="{Binding IsNotEmpty}"
+                            Margin="0,8,0,90"
+                            SelectionMode="None">
+
+                <CollectionView.GroupHeaderTemplate>
+                    <DataTemplate x:DataType="vm:ItemGroup">
+                        <Label Text="{Binding Name}"
+                               Style="{StaticResource CategoryHeaderLabel}"
+                               Margin="20,12,16,4" />
+                    </DataTemplate>
+                </CollectionView.GroupHeaderTemplate>
+
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="models:ShoppingItem">
+                        <SwipeView>
+                            <SwipeView.RightItems>
+                                <SwipeItems Mode="Execute">
+                                    <SwipeItem Text="Delete"
+                                               BackgroundColor="{StaticResource DangerRed}"
+                                               Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ListDetailViewModel}}, Path=DeleteItemCommand}"
+                                               CommandParameter="{Binding}" />
+                                </SwipeItems>
+                            </SwipeView.RightItems>
+
+                            <Border Style="{StaticResource ListCardBorder}"
+                                    Margin="16,4">
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ListDetailViewModel}}, Path=ToggleBoughtCommand}"
+                                        CommandParameter="{Binding}" />
+                                </Border.GestureRecognizers>
+
+                                <Grid ColumnDefinitions="24,*"
+                                      ColumnSpacing="12"
+                                      Padding="4,0">
+
+                                    <!-- Checkbox circle -->
+                                    <Border Grid.Column="0"
+                                            WidthRequest="24"
+                                            HeightRequest="24"
+                                            StrokeThickness="2"
+                                            Stroke="{StaticResource SubtleGray}"
+                                            BackgroundColor="Transparent"
+                                            VerticalOptions="Center">
+                                        <Border.StrokeShape>
+                                            <Ellipse />
+                                        </Border.StrokeShape>
+                                        <Border.Triggers>
+                                            <DataTrigger TargetType="Border"
+                                                         Binding="{Binding IsBought}"
+                                                         Value="True">
+                                                <Setter Property="BackgroundColor" Value="{StaticResource TextCharcoal}" />
+                                                <Setter Property="Stroke" Value="{StaticResource TextCharcoal}" />
+                                            </DataTrigger>
+                                        </Border.Triggers>
+                                        <Label Text="✓"
+                                               TextColor="White"
+                                               FontSize="11"
+                                               HorizontalOptions="Center"
+                                               VerticalOptions="Center"
+                                               IsVisible="{Binding IsBought}" />
+                                    </Border>
+
+                                    <!-- Name + Quantity -->
+                                    <VerticalStackLayout Grid.Column="1"
+                                                        VerticalOptions="Center"
+                                                        Spacing="2">
+                                        <Label Text="{Binding Name}"
+                                               Style="{StaticResource ItemNameLabel}"
+                                               TextDecorations="{Binding IsBought, Converter={StaticResource BoolToTextDecoration}}"
+                                               Opacity="{Binding IsBought, Converter={StaticResource BoolToOpacity}}" />
+                                        <Label Text="{Binding Quantity}"
+                                               Style="{StaticResource ListCardMetaLabel}"
+                                               IsVisible="{Binding Quantity, Converter={StaticResource StringNotEmpty}}" />
+                                    </VerticalStackLayout>
+
+                                </Grid>
+                            </Border>
+                        </SwipeView>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+
+            </CollectionView>
+
+            <!-- FAB -->
+            <Button Style="{StaticResource FABButton}"
+                    Text="+"
+                    HorizontalOptions="End"
+                    VerticalOptions="End"
+                    Margin="0,0,24,28"
+                    Clicked="OnAddItemClicked" />
+
+        </Grid>
+    </Grid>
+</ContentPage>
