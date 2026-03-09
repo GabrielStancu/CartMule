@@ -116,7 +116,7 @@
                                                    ReturnType="Next"
                                                    Unfocused="OnShopUnfocused" />
                                             <Border Grid.Column="1"
-                                                    BackgroundColor="{StaticResource PrimaryYellow}"
+                                                    BackgroundColor="Transparent"
                                                     Stroke="Transparent"
                                                     StrokeThickness="0"
                                                     WidthRequest="36"
@@ -124,7 +124,6 @@
                                                     VerticalOptions="Center"
                                                     HorizontalOptions="Center"
                                                     IsVisible="{Binding Name, Converter={StaticResource StringNotEmpty}}">
-                                                <Border.StrokeShape><RoundRectangle CornerRadius="18" /></Border.StrokeShape>
                                                 <Border.GestureRecognizers>
                                                     <TapGestureRecognizer
                                                         Command="{Binding Source={RelativeSource AncestorType={x:Type vm:AddListViewModel}}, Path=OpenShopMenuCommand}"
@@ -169,7 +168,7 @@
                                                    ReturnType="Next"
                                                    Unfocused="OnCategoryUnfocused" />
                                             <Border Grid.Column="1"
-                                                    BackgroundColor="{StaticResource PrimaryYellow}"
+                                                    BackgroundColor="Transparent"
                                                     Stroke="Transparent"
                                                     StrokeThickness="0"
                                                     WidthRequest="36"
@@ -177,7 +176,6 @@
                                                     VerticalOptions="Center"
                                                     HorizontalOptions="Center"
                                                     IsVisible="{Binding Name, Converter={StaticResource StringNotEmpty}}">
-                                                <Border.StrokeShape><RoundRectangle CornerRadius="18" /></Border.StrokeShape>
                                                 <Border.GestureRecognizers>
                                                     <TapGestureRecognizer
                                                         Command="{Binding Source={RelativeSource AncestorType={x:Type vm:AddListViewModel}}, Path=OpenCategoryMenuCommand}"

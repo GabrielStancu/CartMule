@@ -99,24 +99,23 @@
                            TextColor="{StaticResource SubtleGray}"
                            VerticalOptions="Center" />
                     <Button Grid.Column="1"
-                            Text="Uncheck All"
+                            Text="↺"
                             Style="{StaticResource GhostButton}"
                             IsVisible="{Binding HasBoughtItems}"
                             Command="{Binding UncheckAllCommand}"
-                            FontSize="12"
+                            FontSize="18"
                             Padding="12,0"
                             VerticalOptions="Center" />
 
                     <!-- ⋮ List options button -->
                     <Border Grid.Column="2"
-                            BackgroundColor="{StaticResource PrimaryYellow}"
+                            BackgroundColor="Transparent"
                             Stroke="Transparent"
                             StrokeThickness="0"
                             WidthRequest="36"
                             HeightRequest="36"
                             VerticalOptions="Center"
                             HorizontalOptions="Center">
-                        <Border.StrokeShape><RoundRectangle CornerRadius="18" /></Border.StrokeShape>
                         <Border.GestureRecognizers>
                             <TapGestureRecognizer Command="{Binding RequestListOptionsCommand}" />
                         </Border.GestureRecognizers>
@@ -175,10 +174,15 @@
                                          HorizontalOptions="Center"
                                          Spacing="8"
                                          Padding="32">
+                        <Label Text="No items found"
+                               Style="{StaticResource SectionSubtitleLabel}"
+                               HorizontalOptions="Center"
+                               IsVisible="{Binding IsSearchActive}" />
                         <Label Text="No items yet"
                                Style="{StaticResource SectionSubtitleLabel}"
-                               HorizontalOptions="Center" />
-                        <Label Text="Tap + to add your first item"
+                               HorizontalOptions="Center"
+                               IsVisible="{Binding IsNotSearchActive}" />
+                        <Label Text="Tap + to add an item"
                                HorizontalOptions="Center"
                                TextColor="{StaticResource SubtleGray}"
                                FontFamily="OpenSansRegular"
@@ -339,9 +343,11 @@
                                                         Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ListDetailViewModel}}, Path=RequestItemOptionsCommand}"
                                                         CommandParameter="{Binding}" />
                                                 </Border.GestureRecognizers>
-                                                <Image Source="settings.png"
-                                                       WidthRequest="22"
-                                                       HeightRequest="22"
+                                                <Label Text="⋮"
+                                                       FontSize="20"
+                                                       FontFamily="OpenSansSemibold"
+                                                       FontAttributes="Bold"
+                                                       TextColor="{StaticResource TextCharcoal}"
                                                        HorizontalOptions="Center"
                                                        VerticalOptions="Center" />
                                             </Border>

@@ -16,6 +16,10 @@ namespace CartMule
                 {
                     // Remove underline
                     handler.PlatformView.BackgroundTintList = ColorStateList.ValueOf(Android.Graphics.Color.Transparent);
+                    // Set cursor (caret) color to charcoal on API 29+
+                    if (Android.OS.Build.VERSION.SdkInt >= Android.OS.BuildVersionCodes.Q)
+                        handler.PlatformView.TextCursorDrawable =
+                            new Android.Graphics.Drawables.ColorDrawable(Android.Graphics.Color.ParseColor("#1A1A1A"));
                 }
             });
 

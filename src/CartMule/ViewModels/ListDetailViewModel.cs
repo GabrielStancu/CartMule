@@ -59,6 +59,10 @@ public partial class ListDetailViewModel : BaseViewModel
 
     public bool IsNotEmpty => !IsEmpty;
 
+    /// <summary>True when the search box contains text — used to tailor the empty-state message.</summary>
+    public bool IsSearchActive    => !string.IsNullOrEmpty(SearchQuery);
+    public bool IsNotSearchActive =>  string.IsNullOrEmpty(SearchQuery);
+
     [ObservableProperty]
     bool _hasBoughtItems;
 
@@ -89,7 +93,12 @@ public partial class ListDetailViewModel : BaseViewModel
     [ObservableProperty]
     bool _showListOptions;
 
-    partial void OnSearchQueryChanged(string value) => ApplyItemFilter();
+    partial void OnSearchQueryChanged(string value)
+    {
+        OnPropertyChanged(nameof(IsSearchActive));
+        OnPropertyChanged(nameof(IsNotSearchActive));
+        ApplyItemFilter();
+    }
 
     public int ListId { get; set; }
 
