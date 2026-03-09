@@ -39,6 +39,9 @@ public partial class AddListViewModel : BaseViewModel
     string _name = string.Empty;
 
     [ObservableProperty]
+    string _subtitle = string.Empty;
+
+    [ObservableProperty]
     bool _showDeleteListConfirm;
 
     [ObservableProperty]
@@ -67,7 +70,8 @@ public partial class AddListViewModel : BaseViewModel
     [RelayCommand]
     async Task InitialiseAsync()
     {
-        Title = IsCreateMode ? "New List" : "Edit List";
+        Title    = IsCreateMode ? "New List" : "Edit List";
+        Subtitle = IsCreateMode ? "Create a new shopping list" : "Update list details";
 
         var categories = await _categoryService.GetAllCategoriesAsync();
         Categories.Clear();
@@ -133,10 +137,28 @@ public partial class AddListViewModel : BaseViewModel
         }
     }
 
+    private void TrimExtraBlanksCategory()
+    {
+        var blanks = Categories.Where(c => string.IsNullOrWhiteSpace(c.Name)).ToList();
+        for (int i = 0; i < blanks.Count - 1; i++)
+            Categories.Remove(blanks[i]);
+    }
+
+    private void TrimExtraBlanksShop()
+    {
+        var blanks = Shops.Where(s => string.IsNullOrWhiteSpace(s.Name)).ToList();
+        for (int i = 0; i < blanks.Count - 1; i++)
+            Shops.Remove(blanks[i]);
+    }
+
     public async Task PersistCategoryOnFocusLostAsync(CategoryEditItem item)
     {
         var name = item.Name?.Trim() ?? string.Empty;
-        if (string.IsNullOrWhiteSpace(name)) return;
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            TrimExtraBlanksCategory();
+            return;
+        }
 
         if (item.Id == 0)
         {
@@ -173,8 +195,11 @@ public partial class AddListViewModel : BaseViewModel
         }
     }
 
-    public async Task PersistShopOnFocusLostAsync(ShopEditItem _item)
+    public async Task PersistShopOnFocusLostAsync(ShopEditItem item)
     {
+        var name = item.Name?.Trim() ?? string.Empty;
+        if (string.IsNullOrWhiteSpace(name))
+            TrimExtraBlanksShop();
         if (!IsEditMode) return;
         var shopsString = ShopsDisplay;
         await _listService.UpdateListAsync(ListId, Name.Trim(), shopsString);

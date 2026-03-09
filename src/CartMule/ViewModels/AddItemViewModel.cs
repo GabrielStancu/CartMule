@@ -23,6 +23,9 @@ public partial class AddItemViewModel : BaseViewModel
     string _quantity = string.Empty;
 
     [ObservableProperty]
+    string _subtitle = string.Empty;
+
+    [ObservableProperty]
     Category? _selectedCategory;
 
     public int ListId { get; set; }
@@ -49,7 +52,8 @@ public partial class AddItemViewModel : BaseViewModel
 
             if (IsEditMode)
             {
-                Title = "Edit Item";
+                Title    = "Edit Item";
+                Subtitle = "Update item details";
                 // Pre-populate fields from existing item
                 var items = await _itemService.GetItemsForListAsync(ListId);
                 var existing = items.FirstOrDefault(i => i.Id == ItemId);
@@ -63,7 +67,8 @@ public partial class AddItemViewModel : BaseViewModel
             }
             else
             {
-                Title = "Add Item";
+                Title    = "Add Item";
+                Subtitle = "Add item to your list";
                 SelectedCategory = Categories.FirstOrDefault(c => c.Name == "Other")
                                    ?? Categories.FirstOrDefault();
             }

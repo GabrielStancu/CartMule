@@ -10,6 +10,7 @@
 
     <ContentPage.Resources>
         <converters:StringNotEmptyConverter x:Key="StringNotEmpty" />
+        <converters:AdaptiveFontSizeConverter x:Key="TitleFontSize" />
     </ContentPage.Resources>
 
     <!-- Outer Grid: layers main content + modal overlays -->
@@ -34,15 +35,25 @@
                         Padding="0"
                         WidthRequest="44"
                         HeightRequest="44"
-                        VerticalOptions="Start"
+                        VerticalOptions="End"
+                        Margin="0,0,0,39"
                         Command="{Binding CancelCommand}" />
 
-                <Label Grid.Column="1"
-                       Text="{Binding Title}"
-                       Style="{StaticResource PageTitleLabel}"
-                       FontSize="28"
-                       VerticalOptions="End"
-                       Margin="0,0,0,32" />
+                <VerticalStackLayout Grid.Column="1"
+                                     VerticalOptions="End"
+                                     Spacing="2"
+                                     Margin="0,0,0,28">
+                    <Label Text="{Binding Title}"
+                           Style="{StaticResource PageTitleLabel}"
+                           FontSize="{Binding Title, Converter={StaticResource TitleFontSize}}"
+                           MaxLines="2"
+                           LineBreakMode="WordWrap" />
+                    <Label Text="{Binding Subtitle}"
+                           FontSize="12"
+                           FontFamily="OpenSansRegular"
+                           TextColor="{StaticResource TextCharcoal}"
+                           Opacity="0.65" />
+                </VerticalStackLayout>
 
                 <Image Grid.Column="2"
                        Source="shopping_bag.png"
@@ -93,41 +104,42 @@
                                         Margin="0,0,0,24">
                             <CollectionView.ItemTemplate>
                                 <DataTemplate x:DataType="vm:ShopEditItem">
-                                    <Grid ColumnDefinitions="*,44"
-                                          ColumnSpacing="0"
-                                          Margin="0,0,0,8">
-
-                                        <Border Grid.Column="0"
-                                                Style="{StaticResource InputBorder}">
-                                            <Entry Text="{Binding Name}"
+                                    <Border Style="{StaticResource InputBorder}"
+                                            Padding="0"
+                                            Margin="0,0,0,8">
+                                        <Grid ColumnDefinitions="*,48">
+                                            <Entry Grid.Column="0"
+                                                   Text="{Binding Name}"
                                                    Style="{StaticResource RoundedInputField}"
                                                    Placeholder="Add a shop…"
+                                                   Margin="16,0,0,0"
                                                    ReturnType="Next"
                                                    Unfocused="OnShopUnfocused" />
-                                        </Border>
-
-                                        <!-- ⋮ menu button (only for non-blank entries) -->
-                                        <Border Grid.Column="1"
-                                                BackgroundColor="Transparent"
-                                                StrokeThickness="0"
-                                                WidthRequest="44"
-                                                HeightRequest="48"
-                                                VerticalOptions="Center"
-                                                HorizontalOptions="Center"
-                                                IsVisible="{Binding Name, Converter={StaticResource StringNotEmpty}}">
-                                            <Border.GestureRecognizers>
-                                                <TapGestureRecognizer
-                                                    Command="{Binding Source={RelativeSource AncestorType={x:Type vm:AddListViewModel}}, Path=OpenShopMenuCommand}"
-                                                    CommandParameter="{Binding}" />
-                                            </Border.GestureRecognizers>
-                                            <Label Text="⋮"
-                                                   FontSize="20"
-                                                   FontFamily="OpenSansRegular"
-                                                   TextColor="{StaticResource SubtleGray}"
-                                                   HorizontalOptions="Center"
-                                                   VerticalOptions="Center" />
-                                        </Border>
-                                    </Grid>
+                                            <Border Grid.Column="1"
+                                                    BackgroundColor="{StaticResource PrimaryYellow}"
+                                                    Stroke="Transparent"
+                                                    StrokeThickness="0"
+                                                    WidthRequest="36"
+                                                    HeightRequest="36"
+                                                    VerticalOptions="Center"
+                                                    HorizontalOptions="Center"
+                                                    IsVisible="{Binding Name, Converter={StaticResource StringNotEmpty}}">
+                                                <Border.StrokeShape><RoundRectangle CornerRadius="18" /></Border.StrokeShape>
+                                                <Border.GestureRecognizers>
+                                                    <TapGestureRecognizer
+                                                        Command="{Binding Source={RelativeSource AncestorType={x:Type vm:AddListViewModel}}, Path=OpenShopMenuCommand}"
+                                                        CommandParameter="{Binding}" />
+                                                </Border.GestureRecognizers>
+                                                <Label Text="⋮"
+                                                       FontSize="18"
+                                                       FontAttributes="Bold"
+                                                       FontFamily="OpenSansSemibold"
+                                                       TextColor="{StaticResource TextCharcoal}"
+                                                       HorizontalOptions="Center"
+                                                       VerticalOptions="Center" />
+                                            </Border>
+                                        </Grid>
+                                    </Border>
                                 </DataTemplate>
                             </CollectionView.ItemTemplate>
                         </CollectionView>
@@ -145,41 +157,42 @@
                                         Margin="0,0,0,24">
                             <CollectionView.ItemTemplate>
                                 <DataTemplate x:DataType="vm:CategoryEditItem">
-                                    <Grid ColumnDefinitions="*,44"
-                                          ColumnSpacing="0"
-                                          Margin="0,0,0,8">
-
-                                        <Border Grid.Column="0"
-                                                Style="{StaticResource InputBorder}">
-                                            <Entry Text="{Binding Name}"
+                                    <Border Style="{StaticResource InputBorder}"
+                                            Padding="0"
+                                            Margin="0,0,0,8">
+                                        <Grid ColumnDefinitions="*,48">
+                                            <Entry Grid.Column="0"
+                                                   Text="{Binding Name}"
                                                    Style="{StaticResource RoundedInputField}"
                                                    Placeholder="Add a category…"
+                                                   Margin="16,0,0,0"
                                                    ReturnType="Next"
                                                    Unfocused="OnCategoryUnfocused" />
-                                        </Border>
-
-                                        <!-- ⋮ menu button (only for non-blank entries) -->
-                                        <Border Grid.Column="1"
-                                                BackgroundColor="Transparent"
-                                                StrokeThickness="0"
-                                                WidthRequest="44"
-                                                HeightRequest="48"
-                                                VerticalOptions="Center"
-                                                HorizontalOptions="Center"
-                                                IsVisible="{Binding Name, Converter={StaticResource StringNotEmpty}}">
-                                            <Border.GestureRecognizers>
-                                                <TapGestureRecognizer
-                                                    Command="{Binding Source={RelativeSource AncestorType={x:Type vm:AddListViewModel}}, Path=OpenCategoryMenuCommand}"
-                                                    CommandParameter="{Binding}" />
-                                            </Border.GestureRecognizers>
-                                            <Label Text="⋮"
-                                                   FontSize="20"
-                                                   FontFamily="OpenSansRegular"
-                                                   TextColor="{StaticResource SubtleGray}"
-                                                   HorizontalOptions="Center"
-                                                   VerticalOptions="Center" />
-                                        </Border>
-                                    </Grid>
+                                            <Border Grid.Column="1"
+                                                    BackgroundColor="{StaticResource PrimaryYellow}"
+                                                    Stroke="Transparent"
+                                                    StrokeThickness="0"
+                                                    WidthRequest="36"
+                                                    HeightRequest="36"
+                                                    VerticalOptions="Center"
+                                                    HorizontalOptions="Center"
+                                                    IsVisible="{Binding Name, Converter={StaticResource StringNotEmpty}}">
+                                                <Border.StrokeShape><RoundRectangle CornerRadius="18" /></Border.StrokeShape>
+                                                <Border.GestureRecognizers>
+                                                    <TapGestureRecognizer
+                                                        Command="{Binding Source={RelativeSource AncestorType={x:Type vm:AddListViewModel}}, Path=OpenCategoryMenuCommand}"
+                                                        CommandParameter="{Binding}" />
+                                                </Border.GestureRecognizers>
+                                                <Label Text="⋮"
+                                                       FontSize="18"
+                                                       FontAttributes="Bold"
+                                                       FontFamily="OpenSansSemibold"
+                                                       TextColor="{StaticResource TextCharcoal}"
+                                                       HorizontalOptions="Center"
+                                                       VerticalOptions="Center" />
+                                            </Border>
+                                        </Grid>
+                                    </Border>
                                 </DataTemplate>
                             </CollectionView.ItemTemplate>
                         </CollectionView>

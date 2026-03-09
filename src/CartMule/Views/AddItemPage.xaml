@@ -2,39 +2,72 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:CartMule.ViewModels"
+             xmlns:converters="clr-namespace:CartMule.Converters"
              x:Class="CartMule.Views.AddItemPage"
              x:DataType="vm:AddItemViewModel"
              Shell.NavBarIsVisible="False"
-             BackgroundColor="{StaticResource BackgroundGray}">
+             BackgroundColor="{StaticResource PrimaryYellow}">
 
-    <Grid RowDefinitions="Auto,*">
+    <ContentPage.Resources>
+        <converters:AdaptiveFontSizeConverter x:Key="TitleFontSize" />
+    </ContentPage.Resources>
+
+    <Grid RowDefinitions="{OnPlatform iOS='182,*', Default='154,*'}">
 
         <!-- ── Yellow header ─────────────────────────────────────────── -->
-        <Border Grid.Row="0"
-                BackgroundColor="{StaticResource PrimaryYellow}"
-                Padding="16,52,16,16"
-                StrokeThickness="0">
-            <Grid ColumnDefinitions="44,*,Auto" ColumnSpacing="8">
+        <Grid Grid.Row="0"
+              ColumnDefinitions="44,*,Auto"
+              ColumnSpacing="4"
+              Padding="{OnPlatform iOS='12,52,12,0', Default='12,24,12,0'}">
 
-                <Button Grid.Column="0"
-                        Text="←"
-                        TextColor="{StaticResource TextCharcoal}"
-                        BackgroundColor="Transparent"
-                        FontSize="22"
-                        FontFamily="OpenSansRegular"
-                        Padding="0"
-                        WidthRequest="44"
-                        HeightRequest="44"
-                        VerticalOptions="Center"
-                        Command="{Binding CancelCommand}" />
+            <Button Grid.Column="0"
+                    Text="←"
+                    TextColor="{StaticResource TextCharcoal}"
+                    BackgroundColor="Transparent"
+                    FontSize="22"
+                    FontFamily="OpenSansRegular"
+                    FontAttributes="Bold"
+                    Padding="0"
+                    WidthRequest="44"
+                    HeightRequest="44"
+                    VerticalOptions="End"
+                    Margin="0,0,0,39"
+                    Command="{Binding CancelCommand}" />
 
-                <Label Grid.Column="1"
-                       Text="{Binding Title}"
+            <VerticalStackLayout Grid.Column="1"
+                                 VerticalOptions="End"
+                                 Spacing="2"
+                                 Margin="0,0,0,28">
+                <Label Text="{Binding Title}"
                        Style="{StaticResource PageTitleLabel}"
-                       VerticalOptions="Center" />
+                       FontSize="{Binding Title, Converter={StaticResource TitleFontSize}}"
+                       MaxLines="2"
+                       LineBreakMode="WordWrap" />
+                <Label Text="{Binding Subtitle}"
+                       FontSize="12"
+                       FontFamily="OpenSansRegular"
+                       TextColor="{StaticResource TextCharcoal}"
+                       Opacity="0.65" />
+            </VerticalStackLayout>
 
-            </Grid>
-        </Border>
+            <Image Grid.Column="2"
+                   Source="shopping_bag.png"
+                   HeightRequest="130"
+                   WidthRequest="110"
+                   Aspect="AspectFit"
+                   VerticalOptions="End"
+                   Scale="1.5" />
+
+        </Grid>
+
+        <!-- ── White panel with rounded top corners ──────────────────── -->
+        <Border Grid.Row="1"
+                BackgroundColor="White"
+                StrokeThickness="0"
+                Margin="0,-24,0,0">
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="24,24,0,0" />
+            </Border.StrokeShape>
 
         <!-- ── Form area ─────────────────────────────────────────────── -->
         <ScrollView Grid.Row="1">
@@ -101,7 +134,8 @@
                         Command="{Binding CancelCommand}" />
 
             </VerticalStackLayout>
-        </ScrollView>
+            </ScrollView>
+        </Border>
 
     </Grid>
 </ContentPage>

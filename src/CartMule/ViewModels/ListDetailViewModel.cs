@@ -86,6 +86,9 @@ public partial class ListDetailViewModel : BaseViewModel
     [ObservableProperty]
     bool _showDeleteListConfirm;
 
+    [ObservableProperty]
+    bool _showListOptions;
+
     partial void OnSearchQueryChanged(string value) => ApplyItemFilter();
 
     public int ListId { get; set; }
@@ -200,6 +203,28 @@ public partial class ListDetailViewModel : BaseViewModel
         ShowDeleteItemConfirm = false;
         _selectedVm           = null;
     }
+
+    // ── List options modal (⋮ button in toolbar) ────────────────────────────────
+
+    [RelayCommand]
+    void RequestListOptions() => ShowListOptions = true;
+
+    [RelayCommand]
+    async Task EditListFromOptionsAsync()
+    {
+        ShowListOptions = false;
+        await Shell.Current.GoToAsync($"addlist?listId={ListId}");
+    }
+
+    [RelayCommand]
+    void RequestDeleteFromListOptions()
+    {
+        ShowListOptions = false;
+        ShowDeleteListConfirm = true;
+    }
+
+    [RelayCommand]
+    void CancelListOptions() => ShowListOptions = false;
 
     // ── Delete list (from list detail page) ──────────────────────────────────
 

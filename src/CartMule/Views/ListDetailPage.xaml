@@ -13,6 +13,7 @@
         <converters:BoolToTextDecorationConverter x:Key="BoolToTextDecoration" />
         <converters:BoolToOpacityConverter x:Key="BoolToOpacity" />
         <converters:StringNotEmptyConverter x:Key="StringNotEmpty" />
+        <converters:AdaptiveFontSizeConverter x:Key="TitleFontSize" />
     </ContentPage.Resources>
 
     <Grid>
@@ -34,23 +35,25 @@
                     Padding="0"
                     WidthRequest="44"
                     HeightRequest="44"
-                    VerticalOptions="Start"
+                    VerticalOptions="End"
+                    Margin="0,0,0,43"
                     Clicked="OnBackClicked" />
 
             <VerticalStackLayout Grid.Column="1"
                                  VerticalOptions="End"
                                  Spacing="2"
                                  Margin="0,0,0,32">
+                <Label Text="{Binding Title}"
+                       Style="{StaticResource PageTitleLabel}"
+                       FontSize="{Binding Title, Converter={StaticResource TitleFontSize}}"
+                       MaxLines="2"
+                       LineBreakMode="WordWrap" />
                 <Label Text="{Binding Shops}"
                        FontSize="12"
                        FontFamily="OpenSansRegular"
                        TextColor="{StaticResource TextCharcoal}"
                        Opacity="0.65"
                        IsVisible="{Binding HasShops}" />
-                <Label Text="{Binding Title}"
-                       Style="{StaticResource PageTitleLabel}"
-                       FontSize="28"
-                       LineBreakMode="TailTruncation" />
             </VerticalStackLayout>
 
             <!-- Bag image column with edit icon overlaid at top-right -->
@@ -82,11 +85,11 @@
                 <RoundRectangle CornerRadius="24,24,0,0" />
             </Border.StrokeShape>
 
-                    <Grid RowDefinitions="Auto,Auto,*,Auto">
+                    <Grid RowDefinitions="Auto,Auto,*">
 
-                <!-- Row 0: UpdatedAt + Uncheck All + yellow + button -->
+                <!-- Row 0: UpdatedAt + Uncheck All + ⋮ menu + yellow + button -->
                 <Grid Grid.Row="0"
-                      ColumnDefinitions="*,Auto,52"
+                      ColumnDefinitions="*,Auto,44,52"
                       ColumnSpacing="8"
                       Padding="20,20,16,0">
                     <Label Grid.Column="0"
@@ -103,7 +106,30 @@
                             FontSize="12"
                             Padding="12,0"
                             VerticalOptions="Center" />
-                    <Button Grid.Column="2"
+
+                    <!-- ⋮ List options button -->
+                    <Border Grid.Column="2"
+                            BackgroundColor="{StaticResource PrimaryYellow}"
+                            Stroke="Transparent"
+                            StrokeThickness="0"
+                            WidthRequest="36"
+                            HeightRequest="36"
+                            VerticalOptions="Center"
+                            HorizontalOptions="Center">
+                        <Border.StrokeShape><RoundRectangle CornerRadius="18" /></Border.StrokeShape>
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding RequestListOptionsCommand}" />
+                        </Border.GestureRecognizers>
+                        <Label Text="⋮"
+                               FontSize="20"
+                               FontFamily="OpenSansSemibold"
+                               FontAttributes="Bold"
+                               TextColor="{StaticResource TextCharcoal}"
+                               HorizontalOptions="Center"
+                               VerticalOptions="Center" />
+                    </Border>
+
+                    <Button Grid.Column="3"
                             Text="+"
                             Style="{StaticResource FABButton}"
                             WidthRequest="44"
@@ -333,19 +359,6 @@
 
                 </Grid>
 
-                <!-- Row 3: Delete List button (always visible — list always exists here) -->
-                <Button Grid.Row="3"
-                        Text="Delete List"
-                        BackgroundColor="{StaticResource DangerRed}"
-                        TextColor="White"
-                        FontFamily="OpenSansSemibold"
-                        FontSize="15"
-                        CornerRadius="0"
-                        HeightRequest="52"
-                        HorizontalOptions="Fill"
-                        Command="{Binding RequestDeleteListCommand}"
-                        Margin="0,8,0,0" />
-
             </Grid>
         </Border>
 
@@ -441,7 +454,52 @@
                 </VerticalStackLayout>
             </Border>
         </Grid>
-
+        <!-- ── List options modal (⋮ button) ────────────────────────── -->
+        <Grid IsVisible="{Binding ShowListOptions}"
+              BackgroundColor="#80000000">
+            <Border HorizontalOptions="Center"
+                    VerticalOptions="Center"
+                    BackgroundColor="White"
+                    StrokeThickness="0"
+                    WidthRequest="300">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="20" />
+                </Border.StrokeShape>
+                <VerticalStackLayout Spacing="0" Padding="24">
+                    <Label Text="{Binding Title}"
+                           FontSize="18"
+                           FontAttributes="Bold"
+                           FontFamily="OpenSansSemibold"
+                           TextColor="{StaticResource TextCharcoal}"
+                           HorizontalOptions="Center"
+                           Margin="0,0,0,20" />
+                    <Button Text="Edit"
+                            BackgroundColor="{StaticResource PrimaryYellow}"
+                            TextColor="{StaticResource TextCharcoal}"
+                            FontFamily="OpenSansSemibold"
+                            FontSize="15"
+                            CornerRadius="12"
+                            HeightRequest="48"
+                            HorizontalOptions="Fill"
+                            Command="{Binding EditListFromOptionsCommand}"
+                            Margin="0,0,0,10" />
+                    <Button Text="Delete"
+                            BackgroundColor="{StaticResource DangerRed}"
+                            TextColor="White"
+                            FontFamily="OpenSansSemibold"
+                            FontSize="15"
+                            CornerRadius="12"
+                            HeightRequest="48"
+                            HorizontalOptions="Fill"
+                            Command="{Binding RequestDeleteFromListOptionsCommand}"
+                            Margin="0,0,0,10" />
+                    <Button Text="Cancel"
+                            Style="{StaticResource GhostButton}"
+                            HorizontalOptions="Fill"
+                            Command="{Binding CancelListOptionsCommand}" />
+                </VerticalStackLayout>
+            </Border>
+        </Grid>
         <!-- ── Delete list confirmation overlay ─────────────────────── -->
         <Grid IsVisible="{Binding ShowDeleteListConfirm}"
               BackgroundColor="#80000000">
