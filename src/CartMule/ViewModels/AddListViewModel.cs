@@ -7,10 +7,22 @@ namespace CartMule.ViewModels;
 
 public partial class CategoryEditItem : ObservableObject
 {
-    public int Id { get; init; }  // 0 = not yet persisted
+    public int Id { get; set; }  // 0 = not yet persisted; mutable after DB insert
 
     [ObservableProperty]
     string _name = string.Empty;
+
+    internal Action<CategoryEditItem>? NameChanged;
+    partial void OnNameChanged(string value) => NameChanged?.Invoke(this);
+}
+
+public partial class ShopEditItem : ObservableObject
+{
+    [ObservableProperty]
+    string _name = string.Empty;
+
+    internal Action<ShopEditItem>? NameChanged;
+    partial void OnNameChanged(string value) => NameChanged?.Invoke(this);
 }
 
 [QueryProperty(nameof(ListId), "listId")]
@@ -27,15 +39,24 @@ public partial class AddListViewModel : BaseViewModel
     string _name = string.Empty;
 
     [ObservableProperty]
-    string _shops = string.Empty;
-
-    [ObservableProperty]
-    string _newCategoryName = string.Empty;
-
-    [ObservableProperty]
     bool _showDeleteListConfirm;
 
+    [ObservableProperty]
+    bool _showEditModal;
+
+    [ObservableProperty]
+    string _modalEditName = string.Empty;
+
+    private CategoryEditItem? _modalCategory;
+    private ShopEditItem?     _modalShop;
+
     public ObservableCollection<CategoryEditItem> Categories { get; } = new();
+    public ObservableCollection<ShopEditItem>     Shops      { get; } = new();
+
+    public string ShopsDisplay =>
+        string.Join(", ", Shops
+            .Where(s => !string.IsNullOrWhiteSpace(s.Name))
+            .Select(s => s.Name.Trim()));
 
     public AddListViewModel(IShoppingListService listService, ICategoryService categoryService)
     {
@@ -51,14 +72,23 @@ public partial class AddListViewModel : BaseViewModel
         var categories = await _categoryService.GetAllCategoriesAsync();
         Categories.Clear();
         foreach (var c in categories)
-            Categories.Add(new CategoryEditItem { Id = c.Id, Name = c.Name });
+            AddCategoryItem(new CategoryEditItem { Id = c.Id, Name = c.Name });
+        EnsureBlankTrailingCategory();
 
+        Shops.Clear();
         if (IsEditMode)
         {
             var list = await _listService.GetListByIdAsync(ListId);
-            Name  = list?.Name  ?? string.Empty;
-            Shops = list?.Shops ?? string.Empty;
+            Name = list?.Name ?? string.Empty;
+            if (!string.IsNullOrWhiteSpace(list?.Shops))
+            {
+                foreach (var shop in list.Shops.Split(',')
+                             .Select(s => s.Trim())
+                             .Where(s => s.Length > 0))
+                    AddShopItem(new ShopEditItem { Name = shop });
+            }
         }
+        EnsureBlankTrailingShop();
     }
 
     [RelayCommand]
@@ -66,10 +96,12 @@ public partial class AddListViewModel : BaseViewModel
     {
         if (string.IsNullOrWhiteSpace(Name)) return;
 
+        var shopsString = ShopsDisplay;
+
         if (IsCreateMode)
-            await _listService.CreateListAsync(Name.Trim(), Shops.Trim());
+            await _listService.CreateListAsync(Name.Trim(), shopsString);
         else
-            await _listService.UpdateListAsync(ListId, Name.Trim(), Shops.Trim());
+            await _listService.UpdateListAsync(ListId, Name.Trim(), shopsString);
 
         await Shell.Current.GoToAsync("..");
     }
@@ -79,30 +111,152 @@ public partial class AddListViewModel : BaseViewModel
 
     // ── Category management ──────────────────────────────────────────────────
 
-    [RelayCommand]
-    async Task AddCategoryAsync()
+    private void AddCategoryItem(CategoryEditItem item)
     {
-        if (string.IsNullOrWhiteSpace(NewCategoryName)) return;
-        var created = await _categoryService.CreateCategoryAsync(NewCategoryName.Trim());
-        Categories.Add(new CategoryEditItem { Id = created.Id, Name = created.Name });
-        NewCategoryName = string.Empty;
+        item.NameChanged = OnCategoryNameChanged;
+        Categories.Add(item);
+    }
+
+    private void OnCategoryNameChanged(CategoryEditItem item)
+    {
+        if (!string.IsNullOrWhiteSpace(item.Name) && Categories.Last() == item)
+            EnsureBlankTrailingCategory();
+    }
+
+    private void EnsureBlankTrailingCategory()
+    {
+        if (Categories.Count == 0 || !string.IsNullOrWhiteSpace(Categories.Last().Name))
+        {
+            var blank = new CategoryEditItem();
+            blank.NameChanged = OnCategoryNameChanged;
+            Categories.Add(blank);
+        }
+    }
+
+    public async Task PersistCategoryOnFocusLostAsync(CategoryEditItem item)
+    {
+        var name = item.Name?.Trim() ?? string.Empty;
+        if (string.IsNullOrWhiteSpace(name)) return;
+
+        if (item.Id == 0)
+        {
+            var created = await _categoryService.CreateCategoryAsync(name);
+            item.Id = created.Id;
+        }
+        else
+        {
+            await _categoryService.UpdateCategoryAsync(item.Id, name);
+        }
+    }
+
+    // ── Shop management ──────────────────────────────────────────────────────
+
+    private void AddShopItem(ShopEditItem item)
+    {
+        item.NameChanged = OnShopNameChanged;
+        Shops.Add(item);
+    }
+
+    private void OnShopNameChanged(ShopEditItem item)
+    {
+        if (!string.IsNullOrWhiteSpace(item.Name) && Shops.Last() == item)
+            EnsureBlankTrailingShop();
+    }
+
+    private void EnsureBlankTrailingShop()
+    {
+        if (Shops.Count == 0 || !string.IsNullOrWhiteSpace(Shops.Last().Name))
+        {
+            var blank = new ShopEditItem();
+            blank.NameChanged = OnShopNameChanged;
+            Shops.Add(blank);
+        }
+    }
+
+    public async Task PersistShopOnFocusLostAsync(ShopEditItem _item)
+    {
+        if (!IsEditMode) return;
+        var shopsString = ShopsDisplay;
+        await _listService.UpdateListAsync(ListId, Name.Trim(), shopsString);
+    }
+
+    // ── Edit modal (shared for both categories and shops) ────────────────────
+
+    [RelayCommand]
+    void OpenCategoryMenu(CategoryEditItem item)
+    {
+        _modalCategory = item;
+        _modalShop     = null;
+        ModalEditName  = item.Name;
+        ShowEditModal  = true;
     }
 
     [RelayCommand]
-    async Task DeleteCategoryAsync(CategoryEditItem item)
+    void OpenShopMenu(ShopEditItem item)
     {
-        if (item.Id != 0)
-            await _categoryService.DeleteCategoryAsync(item.Id);
-        Categories.Remove(item);
+        _modalShop     = item;
+        _modalCategory = null;
+        ModalEditName  = item.Name;
+        ShowEditModal  = true;
     }
 
-    /// <summary>Called from code-behind after DisplayPromptAsync.</summary>
-    public async Task RenameCategoryAsync(CategoryEditItem item, string newName)
+    [RelayCommand]
+    async Task SaveEditModalAsync()
     {
-        if (string.IsNullOrWhiteSpace(newName) || newName == item.Name) return;
-        if (item.Id != 0)
-            await _categoryService.UpdateCategoryAsync(item.Id, newName.Trim());
-        item.Name = newName.Trim();
+        var name = ModalEditName.Trim();
+        ShowEditModal = false;
+
+        if (_modalCategory is not null)
+        {
+            if (!string.IsNullOrWhiteSpace(name))
+            {
+                _modalCategory.Name = name;
+                await PersistCategoryOnFocusLostAsync(_modalCategory);
+            }
+            _modalCategory = null;
+        }
+        else if (_modalShop is not null)
+        {
+            if (!string.IsNullOrWhiteSpace(name))
+            {
+                _modalShop.Name = name;
+                await PersistShopOnFocusLostAsync(_modalShop);
+            }
+            _modalShop = null;
+        }
+    }
+
+    [RelayCommand]
+    async Task DeleteEditModalItemAsync()
+    {
+        ShowEditModal = false;
+
+        if (_modalCategory is not null)
+        {
+            var cat = _modalCategory;
+            _modalCategory = null;
+            if (cat.Id != 0)
+                await _categoryService.DeleteCategoryAsync(cat.Id);
+            Categories.Remove(cat);
+            EnsureBlankTrailingCategory();
+        }
+        else if (_modalShop is not null)
+        {
+            var shop = _modalShop;
+            _modalShop = null;
+            Shops.Remove(shop);
+            EnsureBlankTrailingShop();
+            if (IsEditMode)
+                await _listService.UpdateListAsync(ListId, Name.Trim(), ShopsDisplay);
+        }
+    }
+
+    [RelayCommand]
+    void CancelEditModal()
+    {
+        ShowEditModal  = false;
+        _modalCategory = null;
+        _modalShop     = null;
     }
 
     // ── Delete list (edit mode only) ─────────────────────────────────────────
@@ -114,8 +268,8 @@ public partial class AddListViewModel : BaseViewModel
     async Task ConfirmDeleteListAsync()
     {
         ShowDeleteListConfirm = false;
-        await _listService.DeleteListAsync(ListId);
-        // Pop AddListPage and ListDetailPage back to dashboard
+        if (IsEditMode)
+            await _listService.DeleteListAsync(ListId);
         await Shell.Current.GoToAsync("../..");
     }
 

@@ -20,7 +20,7 @@
 
         <!-- ── Yellow header (matches dashboard hero height) ─────────── -->
         <Grid Grid.Row="0"
-              ColumnDefinitions="44,*,44"
+              ColumnDefinitions="44,*,Auto"
               ColumnSpacing="4"
               Padding="{OnPlatform iOS='12,52,12,0', Default='12,24,12,0'}">
 
@@ -30,11 +30,11 @@
                     BackgroundColor="Transparent"
                     FontSize="22"
                     FontFamily="OpenSansRegular"
+                    FontAttributes="Bold"
                     Padding="0"
                     WidthRequest="44"
                     HeightRequest="44"
-                    VerticalOptions="End"
-                    Margin="0,0,0,28"
+                    VerticalOptions="Start"
                     Clicked="OnBackClicked" />
 
             <VerticalStackLayout Grid.Column="1"
@@ -53,18 +53,24 @@
                        LineBreakMode="TailTruncation" />
             </VerticalStackLayout>
 
-            <Button Grid.Column="2"
-                    Text="✏"
-                    TextColor="{StaticResource TextCharcoal}"
-                    BackgroundColor="Transparent"
-                    FontSize="18"
-                    FontFamily="OpenSansRegular"
-                    Padding="0"
-                    WidthRequest="44"
-                    HeightRequest="44"
-                    VerticalOptions="End"
-                    Margin="0,0,0,28"
-                    Clicked="OnRenameClicked" />
+            <!-- Bag image column with edit icon overlaid at top-right -->
+            <Grid Grid.Column="2">
+                <Image Source="shopping_bag.png"
+                       HeightRequest="130"
+                       WidthRequest="110"
+                       Aspect="AspectFit"
+                       VerticalOptions="End"
+                       Scale="1.5" />
+                <ImageButton Source="edit_icon.png"
+                             BackgroundColor="Transparent"
+                             Padding="0"
+                             WidthRequest="44"
+                             HeightRequest="44"
+                             VerticalOptions="Start"
+                             HorizontalOptions="End"
+                             Margin="0,0,8,0"
+                             Clicked="OnRenameClicked" />
+            </Grid>
         </Grid>
 
         <!-- ── White panel with rounded top corners ─────────────────── -->
@@ -76,7 +82,7 @@
                 <RoundRectangle CornerRadius="24,24,0,0" />
             </Border.StrokeShape>
 
-            <Grid RowDefinitions="Auto,Auto,*">
+                    <Grid RowDefinitions="Auto,Auto,*,Auto">
 
                 <!-- Row 0: UpdatedAt + Uncheck All + yellow + button -->
                 <Grid Grid.Row="0"
@@ -180,7 +186,7 @@
                                                         StrokeThickness="0"
                                                         WidthRequest="80">
                                                     <Border.StrokeShape>
-                                                        <RoundRectangle CornerRadius="0,20,20,0" />
+                                                        <RoundRectangle CornerRadius="0,20,0,20" />
                                                     </Border.StrokeShape>
                                                     <VerticalStackLayout VerticalOptions="Center"
                                                                          HorizontalOptions="Center"
@@ -215,7 +221,7 @@
                                                 DropCommandParameter="{Binding}" />
                                         </VerticalStackLayout.GestureRecognizers>
 
-                                        <Grid ColumnDefinitions="32,48,*,40,40"
+                                        <Grid ColumnDefinitions="32,48,*,44"
                                               ColumnSpacing="0"
                                               Padding="12,10,4,10">
 
@@ -294,46 +300,22 @@
                                                        IsVisible="{Binding Quantity, Converter={StaticResource StringNotEmpty}}" />
                                             </VerticalStackLayout>
 
-                                            <!-- Col 3: Pencil edit button (yellow) -->
+                                            <!-- Col 3: Settings icon → item options modal -->
                                             <Border Grid.Column="3"
-                                                    BackgroundColor="{StaticResource PrimaryYellow}"
-                                                    StrokeThickness="0"
-                                                    WidthRequest="32"
-                                                    HeightRequest="32"
-                                                    VerticalOptions="Center"
-                                                    HorizontalOptions="Center">
-                                                <Border.StrokeShape>
-                                                    <RoundRectangle CornerRadius="8" />
-                                                </Border.StrokeShape>
-                                                <Border.GestureRecognizers>
-                                                    <TapGestureRecognizer
-                                                        Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ListDetailViewModel}}, Path=EditItemCommand}"
-                                                        CommandParameter="{Binding}" />
-                                                </Border.GestureRecognizers>
-                                                <Label Text="✏"
-                                                       TextColor="{StaticResource TextCharcoal}"
-                                                       FontSize="14"
-                                                       HorizontalOptions="Center"
-                                                       VerticalOptions="Center" />
-                                            </Border>
-
-                                            <!-- Col 4: X delete button -->
-                                            <Border Grid.Column="4"
                                                     BackgroundColor="Transparent"
                                                     StrokeThickness="0"
-                                                    WidthRequest="36"
-                                                    HeightRequest="36"
+                                                    WidthRequest="44"
+                                                    HeightRequest="44"
                                                     VerticalOptions="Center"
                                                     HorizontalOptions="Center">
                                                 <Border.GestureRecognizers>
                                                     <TapGestureRecognizer
-                                                        Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ListDetailViewModel}}, Path=RequestDeleteItemCommand}"
+                                                        Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ListDetailViewModel}}, Path=RequestItemOptionsCommand}"
                                                         CommandParameter="{Binding}" />
                                                 </Border.GestureRecognizers>
-                                                <Label Text="✕"
-                                                       TextColor="{StaticResource DangerRed}"
-                                                       FontSize="16"
-                                                       FontAttributes="Bold"
+                                                <Image Source="settings.png"
+                                                       WidthRequest="22"
+                                                       HeightRequest="22"
                                                        HorizontalOptions="Center"
                                                        VerticalOptions="Center" />
                                             </Border>
@@ -350,10 +332,71 @@
                     </CollectionView>
 
                 </Grid>
+
+                <!-- Row 3: Delete List button (always visible — list always exists here) -->
+                <Button Grid.Row="3"
+                        Text="Delete List"
+                        BackgroundColor="{StaticResource DangerRed}"
+                        TextColor="White"
+                        FontFamily="OpenSansSemibold"
+                        FontSize="15"
+                        CornerRadius="0"
+                        HeightRequest="52"
+                        HorizontalOptions="Fill"
+                        Command="{Binding RequestDeleteListCommand}"
+                        Margin="0,8,0,0" />
+
             </Grid>
         </Border>
 
     </Grid>
+
+        <!-- ── Item options modal ─────────────────────────────────────── -->
+        <Grid IsVisible="{Binding ShowItemOptions}"
+              BackgroundColor="#80000000">
+            <Border HorizontalOptions="Center"
+                    VerticalOptions="Center"
+                    BackgroundColor="White"
+                    StrokeThickness="0"
+                    WidthRequest="300">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="20" />
+                </Border.StrokeShape>
+                <VerticalStackLayout Spacing="0" Padding="24">
+                    <Label Text="{Binding ItemOptionsName}"
+                           FontSize="18"
+                           FontAttributes="Bold"
+                           FontFamily="OpenSansSemibold"
+                           TextColor="{StaticResource TextCharcoal}"
+                           HorizontalOptions="Center"
+                           Margin="0,0,0,20" />
+                    <Button Text="Edit"
+                            BackgroundColor="{StaticResource PrimaryYellow}"
+                            TextColor="{StaticResource TextCharcoal}"
+                            FontFamily="OpenSansSemibold"
+                            FontSize="15"
+                            CornerRadius="12"
+                            HeightRequest="48"
+                            HorizontalOptions="Fill"
+                            Command="{Binding EditSelectedItemCommand}"
+                            Margin="0,0,0,10" />
+                    <Button Text="Delete"
+                            BackgroundColor="{StaticResource DangerRed}"
+                            TextColor="White"
+                            FontFamily="OpenSansSemibold"
+                            FontSize="15"
+                            CornerRadius="12"
+                            HeightRequest="48"
+                            HorizontalOptions="Fill"
+                            Command="{Binding RequestDeleteFromOptionsCommand}"
+                            Margin="0,0,0,10" />
+                    <Button Text="Cancel"
+                            Style="{StaticResource GhostButton}"
+                            HorizontalOptions="Fill"
+                            Command="{Binding CancelItemOptionsCommand}" />
+                </VerticalStackLayout>
+            </Border>
+        </Grid>
 
         <!-- ── Delete item confirmation overlay ─────────────────────── -->
         <Grid IsVisible="{Binding ShowDeleteItemConfirm}"
@@ -395,6 +438,50 @@
                             Style="{StaticResource GhostButton}"
                             HorizontalOptions="Fill"
                             Command="{Binding CancelDeleteItemCommand}" />
+                </VerticalStackLayout>
+            </Border>
+        </Grid>
+
+        <!-- ── Delete list confirmation overlay ─────────────────────── -->
+        <Grid IsVisible="{Binding ShowDeleteListConfirm}"
+              BackgroundColor="#80000000">
+            <Border HorizontalOptions="Center"
+                    VerticalOptions="Center"
+                    BackgroundColor="White"
+                    StrokeThickness="0"
+                    WidthRequest="300">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="20" />
+                </Border.StrokeShape>
+                <VerticalStackLayout Spacing="0" Padding="24">
+                    <Label Text="Delete this list?"
+                           FontSize="18"
+                           FontAttributes="Bold"
+                           FontFamily="OpenSansSemibold"
+                           TextColor="{StaticResource TextCharcoal}"
+                           HorizontalOptions="Center"
+                           Margin="0,0,0,8" />
+                    <Label Text="All items in this list will also be permanently deleted."
+                           FontSize="14"
+                           FontFamily="OpenSansRegular"
+                           TextColor="{StaticResource SubtleGray}"
+                           HorizontalOptions="Center"
+                           HorizontalTextAlignment="Center"
+                           Margin="0,0,0,24" />
+                    <Button Text="Delete"
+                            BackgroundColor="{StaticResource DangerRed}"
+                            TextColor="White"
+                            FontFamily="OpenSansSemibold"
+                            FontSize="15"
+                            CornerRadius="12"
+                            HeightRequest="48"
+                            HorizontalOptions="Fill"
+                            Command="{Binding ConfirmDeleteListCommand}"
+                            Margin="0,0,0,10" />
+                    <Button Text="Cancel"
+                            Style="{StaticResource GhostButton}"
+                            HorizontalOptions="Fill"
+                            Command="{Binding CancelDeleteListCommand}" />
                 </VerticalStackLayout>
             </Border>
         </Grid>

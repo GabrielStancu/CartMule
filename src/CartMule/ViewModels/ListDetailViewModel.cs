@@ -51,7 +51,7 @@ public partial class ListDetailViewModel : BaseViewModel
     private List<ShoppingItemViewModel> _allItemVms = new();
     private Dictionary<int, string>     _cachedCatNames = new();
     private ShoppingItemViewModel?      _draggedVm;
-    private ShoppingItemViewModel?      _pendingDeleteVm;
+    private ShoppingItemViewModel?      _selectedVm;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(IsNotEmpty))]
@@ -75,7 +75,16 @@ public partial class ListDetailViewModel : BaseViewModel
     public bool HasShops => !string.IsNullOrEmpty(Shops);
 
     [ObservableProperty]
+    bool _showItemOptions;
+
+    [ObservableProperty]
+    string _itemOptionsName = string.Empty;
+
+    [ObservableProperty]
     bool _showDeleteItemConfirm;
+
+    [ObservableProperty]
+    bool _showDeleteListConfirm;
 
     partial void OnSearchQueryChanged(string value) => ApplyItemFilter();
 
@@ -132,12 +141,45 @@ public partial class ListDetailViewModel : BaseViewModel
         await LoadItemsAsync();
     }
 
+    // ── Item options modal (settings icon) ──────────────────────────────────
+
+    [RelayCommand]
+    void RequestItemOptions(ShoppingItemViewModel vm)
+    {
+        _selectedVm     = vm;
+        ItemOptionsName = vm.Name;
+        ShowItemOptions = true;
+    }
+
+    [RelayCommand]
+    async Task EditSelectedItemAsync()
+    {
+        if (_selectedVm is null) return;
+        ShowItemOptions = false;
+        await Shell.Current.GoToAsync($"additem?listId={_selectedVm.ListId}&itemId={_selectedVm.Id}");
+    }
+
+    [RelayCommand]
+    void RequestDeleteFromOptions()
+    {
+        ShowItemOptions      = false;
+        ShowDeleteItemConfirm = true;
+        // _selectedVm already set
+    }
+
+    [RelayCommand]
+    void CancelItemOptions()
+    {
+        ShowItemOptions = false;
+        _selectedVm     = null;
+    }
+
     // ── Delete item with confirmation modal ──────────────────────────────────
 
     [RelayCommand]
     void RequestDeleteItem(ShoppingItemViewModel vm)
     {
-        _pendingDeleteVm      = vm;
+        _selectedVm          = vm;
         ShowDeleteItemConfirm = true;
     }
 
@@ -145,10 +187,10 @@ public partial class ListDetailViewModel : BaseViewModel
     async Task ConfirmDeleteItemAsync()
     {
         ShowDeleteItemConfirm = false;
-        if (_pendingDeleteVm is null) return;
-        await _itemService.DeleteItemAsync(_pendingDeleteVm.Id);
-        _allItemVms.Remove(_pendingDeleteVm);
-        _pendingDeleteVm = null;
+        if (_selectedVm is null) return;
+        await _itemService.DeleteItemAsync(_selectedVm.Id);
+        _allItemVms.Remove(_selectedVm);
+        _selectedVm = null;
         ApplyItemFilter();
     }
 
@@ -156,8 +198,24 @@ public partial class ListDetailViewModel : BaseViewModel
     void CancelDeleteItem()
     {
         ShowDeleteItemConfirm = false;
-        _pendingDeleteVm      = null;
+        _selectedVm           = null;
     }
+
+    // ── Delete list (from list detail page) ──────────────────────────────────
+
+    [RelayCommand]
+    void RequestDeleteList() => ShowDeleteListConfirm = true;
+
+    [RelayCommand]
+    async Task ConfirmDeleteListAsync()
+    {
+        ShowDeleteListConfirm = false;
+        await _listService.DeleteListAsync(ListId);
+        await Shell.Current.GoToAsync("..");
+    }
+
+    [RelayCommand]
+    void CancelDeleteList() => ShowDeleteListConfirm = false;
 
     [RelayCommand]
     async Task UncheckAllAsync()

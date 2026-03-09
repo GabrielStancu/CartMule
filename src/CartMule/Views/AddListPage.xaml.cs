@@ -19,19 +19,15 @@ public partial class AddListPage : ContentPage
         _viewModel.InitialiseCommand.Execute(null);
     }
 
-    private async void OnEditCategoryClicked(object sender, EventArgs e)
+    private async void OnCategoryUnfocused(object sender, FocusEventArgs e)
     {
         if (sender is not BindableObject b || b.BindingContext is not CategoryEditItem cat) return;
+        await _viewModel.PersistCategoryOnFocusLostAsync(cat);
+    }
 
-        var newName = await DisplayPromptAsync(
-            "Rename Category",
-            "Enter a new name",
-            "Save",
-            "Cancel",
-            initialValue: cat.Name,
-            maxLength: 60);
-
-        if (string.IsNullOrWhiteSpace(newName)) return;
-        await _viewModel.RenameCategoryAsync(cat, newName.Trim());
+    private async void OnShopUnfocused(object sender, FocusEventArgs e)
+    {
+        if (sender is not BindableObject b || b.BindingContext is not ShopEditItem shop) return;
+        await _viewModel.PersistShopOnFocusLostAsync(shop);
     }
 }
