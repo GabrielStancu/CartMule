@@ -1,5 +1,0 @@
-[assembly: XmlnsDefinition("http://schemas.microsoft.com/dotnet/maui/global", "CartMule")]
-[assembly: XmlnsDefinition("http://schemas.microsoft.com/dotnet/maui/global", "CartMule.Pages")]
-[assembly: XmlnsDefinition("http://schemas.microsoft.com/dotnet/maui/global", "CartMule.ViewModels")]
-[assembly: XmlnsDefinition("http://schemas.microsoft.com/dotnet/maui/global", "CartMule.Views")]
-[assembly: XmlnsDefinition("http://schemas.microsoft.com/dotnet/maui/global", "CartMule.Converters")]

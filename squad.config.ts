@@ -1,7 +1,7 @@
 import type { SquadConfig } from '@bradygaster/squad';
 
 /**
- * Squad Configuration for CartMule
+ * Squad Configuration for TouCart
  * 
  */
 const config: SquadConfig = {

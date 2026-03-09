@@ -2,7 +2,7 @@
 
 ## Core Context
 
-**Project:** CartMule — local-only shopping list manager in .NET 9 MAUI  
+**Project:** TouCart — local-only shopping list manager in .NET 9 MAUI  
 **Requested by:** Gabriel  
 **My role:** UI Dev — XAML pages, design system, animations, flat/minimalist aesthetic
 
@@ -51,7 +51,7 @@
   - `SeparatorLine` — BoxView: LightGray, 1px height, Fill
   - `CountBadgeBorder` — yellow pill (radius 10), padding 10,4
   - `CountBadgeLabel` — 12px semibold, TextCharcoal
-- Converters (namespace `CartMule.Converters`):
+- Converters (namespace `TouCart.Converters`):
   - `BoolToTextDecorationConverter` — `true` → `Strikethrough`, `false` → `None`
   - `BoolToOpacityConverter` — `true` → `0.45` (dimmed/bought), `false` → `1.0` (active)
 - Color keys: `PrimaryYellow` (#FFD200), `TextCharcoal` (#1A1A1A), `SubtleGray` (#757575), `LightGray` (#E8E8E8), `Surface` (#FFFFFF), `Background` (#F7F7F7), `DangerRed` (#FF3B30), `SuccessGreen` (#34C759)
@@ -63,11 +63,11 @@
 - SwipeView RightItems Mode="Execute" for delete swipe
 - TapGestureRecognizer on card Border binds to OpenListCommand via RelativeSource AncestorType
 - FAB uses Clicked event (code-behind) so DisplayPromptAsync can collect the list name
-- x:DataType="vm:ListSummaryItem" on DataTemplate for compiled bindings; type lives in CartMule.ViewModels namespace
+- x:DataType="vm:ListSummaryItem" on DataTemplate for compiled bindings; type lives in TouCart.ViewModels namespace
 
 ### Chunk 4 — ListDetailPage (2026-03-07)
 - Page declares converters in ContentPage.Resources (BoolToTextDecoration, BoolToOpacity, StringNotEmpty)
-- xmlns:models="clr-namespace:CartMule.Models" needed for x:DataType on item DataTemplate
+- xmlns:models="clr-namespace:TouCart.Models" needed for x:DataType on item DataTemplate
 - Grouped CollectionView: GroupHeaderTemplate uses x:DataType="vm:ItemGroup", ItemTemplate uses x:DataType="models:ShoppingItem"
 - Circle checkbox: Border with Ellipse StrokeShape, DataTrigger fills it dark when IsBought=true
 - ToggleBoughtCommand and DeleteItemCommand bound via RelativeSource AncestorType on ListDetailViewModel (same XC0025 warning as dashboard — harmless)

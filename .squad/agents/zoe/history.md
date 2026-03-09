@@ -2,7 +2,7 @@
 
 ## Core Context
 
-**Project:** CartMule — local-only shopping list manager in .NET 9 MAUI  
+**Project:** TouCart — local-only shopping list manager in .NET 9 MAUI  
 **Requested by:** Gabriel  
 **My role:** Backend Dev — SQLite models, repositories, services, ViewModels, DI wiring
 
@@ -33,7 +33,7 @@
 
 ### Chunk 1 — Domain Models (2026-03-07)
 
-**Files created** (all in namespace `CartMule.Models`, folder `src/CartMule/CartMule/Models/`):
+**Files created** (all in namespace `TouCart.Models`, folder `src/TouCart/TouCart/Models/`):
 
 - `Category.cs` — `[PrimaryKey, AutoIncrement] Id`, `[NotNull] Name`, `SortOrder (int)`.
   Includes `static readonly IReadOnlyList<Category> Defaults` with 8 seeded entries (Produce→Other).

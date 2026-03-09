@@ -2,8 +2,8 @@
   "version": "1.0.0",
   "assignments": [
     {
-      "assignment_id": "cartmule-init-2026-03-07",
-      "project": "CartMule",
+      "assignment_id": "TouCart-init-2026-03-07",
+      "project": "TouCart",
       "universe": "firefly",
       "created_at": "2026-03-07T00:00:00Z",
       "agents": [

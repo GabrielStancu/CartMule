@@ -1,0 +1,5 @@
+[assembly: XmlnsDefinition("http://schemas.microsoft.com/dotnet/maui/global", "TouCart")]
+[assembly: XmlnsDefinition("http://schemas.microsoft.com/dotnet/maui/global", "TouCart.Pages")]
+[assembly: XmlnsDefinition("http://schemas.microsoft.com/dotnet/maui/global", "TouCart.ViewModels")]
+[assembly: XmlnsDefinition("http://schemas.microsoft.com/dotnet/maui/global", "TouCart.Views")]
+[assembly: XmlnsDefinition("http://schemas.microsoft.com/dotnet/maui/global", "TouCart.Converters")]

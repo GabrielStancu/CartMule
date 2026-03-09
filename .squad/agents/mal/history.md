@@ -2,7 +2,7 @@
 
 ## Core Context
 
-**Project:** CartMule — a local-only shopping list manager in .NET 9 MAUI  
+**Project:** TouCart — a local-only shopping list manager in .NET 9 MAUI  
 **Requested by:** Gabriel  
 **My role:** Lead & Architect — project structure, MVVM wiring, code review, go/no-go calls
 

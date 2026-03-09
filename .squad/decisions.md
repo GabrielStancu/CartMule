@@ -4,7 +4,7 @@
 
 ### 2026-03-07: Architecture — Clean MVVM with Repository Pattern
 **By:** Gabriel (via Coordinator)  
-**What:** CartMule uses Clean MVVM. Layer order: Models → Repositories (interfaces + SQLite-net-PCL impls) → Services → ViewModels → XAML Pages. No direct DB access from ViewModels.  
+**What:** TouCart uses Clean MVVM. Layer order: Models → Repositories (interfaces + SQLite-net-PCL impls) → Services → ViewModels → XAML Pages. No direct DB access from ViewModels.  
 **Why:** Separation of concerns; supports future testability; requested by user.
 
 ---
@@ -39,7 +39,7 @@
 
 ### 2026-03-07: Chunk 1 — Foundation complete
 **By:** Wash (Tech Lead)
-**What:** Added sqlite-net-pcl 1.9.172, SQLitePCLRaw.bundle_green 2.1.10, CommunityToolkit.Mvvm 8.3.2. Created BaseViewModel using ObservableObject partial pattern. Established folder structure. DatabasePath constant in MauiProgram.cs points to AppDataDirectory/cartmule.db3.
+**What:** Added sqlite-net-pcl 1.9.172, SQLitePCLRaw.bundle_green 2.1.10, CommunityToolkit.Mvvm 8.3.2. Created BaseViewModel using ObservableObject partial pattern. Established folder structure. DatabasePath constant in MauiProgram.cs points to AppDataDirectory/TouCart.db3.
 **Why:** Foundation for all subsequent chunks.
 
 ---

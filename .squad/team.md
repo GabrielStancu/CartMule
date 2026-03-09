@@ -1,8 +1,8 @@
-# CartMule Squad
+# TouCart Squad
 
 ## Project Context
 
-**Project:** CartMule  
+**Project:** TouCart  
 **Description:** A local-only shopping list manager built with .NET 9 MAUI. Multi-list dashboard with item counts and timestamps, category-grouped items, shopping mode with checked-item strikethrough and animated reorder, and auto-reset (Uncheck All). Flat/minimalist aesthetic: Yellow #FFD200, White #FFFFFF, Dark Grey #1A1A1A.  
 **Tech Stack:** C# · .NET 9 MAUI · SQLite-net-PCL · Clean MVVM · Dependency Injection via MauiProgram.cs  
 **User:** Gabriel  
