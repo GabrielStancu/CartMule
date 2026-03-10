@@ -45,6 +45,9 @@ public partial class ListDetailViewModel : BaseViewModel
     private readonly IShoppingListService _listService;
     private readonly IShoppingItemService _itemService;
     private readonly ICategoryService     _categoryService;
+    private readonly ILocalizationService _loc;
+
+    public ILocalizationService Loc => _loc;
 
     public ObservableCollection<ItemGroup> Groups { get; } = new();
 
@@ -105,11 +108,13 @@ public partial class ListDetailViewModel : BaseViewModel
     public ListDetailViewModel(
         IShoppingListService listService,
         IShoppingItemService itemService,
-        ICategoryService categoryService)
+        ICategoryService categoryService,
+        ILocalizationService loc)
     {
         _listService     = listService;
         _itemService     = itemService;
         _categoryService = categoryService;
+        _loc             = loc;
     }
 
     [RelayCommand]
@@ -123,11 +128,11 @@ public partial class ListDetailViewModel : BaseViewModel
             Title          = list?.Name ?? "List";
             Shops          = list?.Shops ?? string.Empty;
             UpdatedDisplay = list is not null
-                ? $"Updated {list.UpdatedAt.ToLocalTime():MMM d, H:mm}"
+                ? _loc.FormatUpdated(list.UpdatedAt)
                 : string.Empty;
 
             var categories  = await _categoryService.GetAllCategoriesAsync();
-            _cachedCatNames = categories.ToDictionary(c => c.Id, c => c.Name);
+            _cachedCatNames = categories.ToDictionary(c => c.Id, c => _loc.TranslateCategoryName(c.Name));
             var items       = await _itemService.GetItemsForListAsync(ListId);
 
             if (items.Count > 1 && items.All(i => i.SortOrder == 0))
@@ -326,19 +331,20 @@ public partial class ListDetailViewModel : BaseViewModel
     {
         Groups.Clear();
 
-        var unbought = items.Where(v => !v.Source.IsBought).ToList();
-        var bought   = items.Where(v =>  v.Source.IsBought).ToList();
+        var unbought      = items.Where(v => !v.Source.IsBought).ToList();
+        var bought        = items.Where(v =>  v.Source.IsBought).ToList();
+        var otherFallback = _loc.Other;
 
         foreach (var g in unbought.GroupBy(v => v.Source.CategoryId))
         {
-            var name = catNames.GetValueOrDefault(g.Key, "Other");
+            var name = catNames.GetValueOrDefault(g.Key, otherFallback);
             Groups.Add(new ItemGroup(name, false, g.ToList()));
         }
 
         if (bought.Count > 0)
-            Groups.Add(new ItemGroup("In Cart ✓", true, bought));
+            Groups.Add(new ItemGroup(_loc.InCart, true, bought));
 
-        IsEmpty       = Groups.Count == 0;
+        IsEmpty        = Groups.Count == 0;
         HasBoughtItems = bought.Count > 0;
     }
 }

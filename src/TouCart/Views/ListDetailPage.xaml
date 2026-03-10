@@ -150,7 +150,7 @@
                     </Border.StrokeShape>
                     <Grid ColumnDefinitions="*,40" Padding="16,0">
                         <Entry Grid.Column="0"
-                               Placeholder="Filter items..."
+                               Placeholder="{Binding Loc.FilterItemsPlaceholder}"
                                Text="{Binding SearchQuery}"
                                BackgroundColor="Transparent"
                                FontFamily="OpenSansRegular"
@@ -174,15 +174,15 @@
                                          HorizontalOptions="Center"
                                          Spacing="8"
                                          Padding="32">
-                        <Label Text="No items found"
+                        <Label Text="{Binding Loc.NoItemsFound}"
                                Style="{StaticResource SectionSubtitleLabel}"
                                HorizontalOptions="Center"
                                IsVisible="{Binding IsSearchActive}" />
-                        <Label Text="No items yet"
+                        <Label Text="{Binding Loc.NoItemsYet}"
                                Style="{StaticResource SectionSubtitleLabel}"
                                HorizontalOptions="Center"
                                IsVisible="{Binding IsNotSearchActive}" />
-                        <Label Text="Tap + to add an item"
+                        <Label Text="{Binding Loc.TapToAddItem}"
                                HorizontalOptions="Center"
                                TextColor="{StaticResource SubtleGray}"
                                FontFamily="OpenSansRegular"
@@ -225,7 +225,7 @@
                                                                TextColor="White"
                                                                FontSize="20"
                                                                HorizontalOptions="Center" />
-                                                        <Label Text="Delete"
+                                                        <Label Text="{Binding Source={RelativeSource AncestorType={x:Type vm:ListDetailViewModel}}, Path=Loc.Delete}"
                                                                TextColor="White"
                                                                FontSize="11"
                                                                FontFamily="OpenSansRegular"
@@ -389,7 +389,7 @@
                            TextColor="{StaticResource TextCharcoal}"
                            HorizontalOptions="Center"
                            Margin="0,0,0,20" />
-                    <Button Text="Edit"
+                    <Button Text="{Binding Loc.Edit}"
                             BackgroundColor="{StaticResource PrimaryYellow}"
                             TextColor="{StaticResource TextCharcoal}"
                             FontFamily="OpenSansSemibold"
@@ -399,7 +399,7 @@
                             HorizontalOptions="Fill"
                             Command="{Binding EditSelectedItemCommand}"
                             Margin="0,0,0,10" />
-                    <Button Text="Delete"
+                    <Button Text="{Binding Loc.Delete}"
                             BackgroundColor="{StaticResource DangerRed}"
                             TextColor="White"
                             FontFamily="OpenSansSemibold"
@@ -409,7 +409,7 @@
                             HorizontalOptions="Fill"
                             Command="{Binding RequestDeleteFromOptionsCommand}"
                             Margin="0,0,0,10" />
-                    <Button Text="Cancel"
+                    <Button Text="{Binding Loc.Cancel}"
                             Style="{StaticResource GhostButton}"
                             HorizontalOptions="Fill"
                             Command="{Binding CancelItemOptionsCommand}" />
@@ -429,21 +429,21 @@
                     <RoundRectangle CornerRadius="20" />
                 </Border.StrokeShape>
                 <VerticalStackLayout Spacing="0" Padding="24">
-                    <Label Text="Delete item?"
+                    <Label Text="{Binding Loc.DeleteItemTitle}"
                            FontSize="18"
                            FontAttributes="Bold"
                            FontFamily="OpenSansSemibold"
                            TextColor="{StaticResource TextCharcoal}"
                            HorizontalOptions="Center"
                            Margin="0,0,0,8" />
-                    <Label Text="This item will be permanently removed from the list."
+                    <Label Text="{Binding Loc.DeleteItemMessage}"
                            FontSize="14"
                            FontFamily="OpenSansRegular"
                            TextColor="{StaticResource SubtleGray}"
                            HorizontalOptions="Center"
                            HorizontalTextAlignment="Center"
                            Margin="0,0,0,24" />
-                    <Button Text="Delete"
+                    <Button Text="{Binding Loc.Delete}"
                             BackgroundColor="{StaticResource DangerRed}"
                             TextColor="White"
                             FontFamily="OpenSansSemibold"
@@ -453,7 +453,7 @@
                             HorizontalOptions="Fill"
                             Command="{Binding ConfirmDeleteItemCommand}"
                             Margin="0,0,0,10" />
-                    <Button Text="Cancel"
+                    <Button Text="{Binding Loc.Cancel}"
                             Style="{StaticResource GhostButton}"
                             HorizontalOptions="Fill"
                             Command="{Binding CancelDeleteItemCommand}" />
@@ -479,7 +479,7 @@
                            TextColor="{StaticResource TextCharcoal}"
                            HorizontalOptions="Center"
                            Margin="0,0,0,20" />
-                    <Button Text="Edit"
+                    <Button Text="{Binding Loc.Edit}"
                             BackgroundColor="{StaticResource PrimaryYellow}"
                             TextColor="{StaticResource TextCharcoal}"
                             FontFamily="OpenSansSemibold"
@@ -489,7 +489,7 @@
                             HorizontalOptions="Fill"
                             Command="{Binding EditListFromOptionsCommand}"
                             Margin="0,0,0,10" />
-                    <Button Text="Delete"
+                    <Button Text="{Binding Loc.Delete}"
                             BackgroundColor="{StaticResource DangerRed}"
                             TextColor="White"
                             FontFamily="OpenSansSemibold"
@@ -499,7 +499,7 @@
                             HorizontalOptions="Fill"
                             Command="{Binding RequestDeleteFromListOptionsCommand}"
                             Margin="0,0,0,10" />
-                    <Button Text="Cancel"
+                    <Button Text="{Binding Loc.Cancel}"
                             Style="{StaticResource GhostButton}"
                             HorizontalOptions="Fill"
                             Command="{Binding CancelListOptionsCommand}" />
@@ -518,21 +518,21 @@
                     <RoundRectangle CornerRadius="20" />
                 </Border.StrokeShape>
                 <VerticalStackLayout Spacing="0" Padding="24">
-                    <Label Text="Delete this list?"
+                    <Label Text="{Binding Loc.DeleteListTitle}"
                            FontSize="18"
                            FontAttributes="Bold"
                            FontFamily="OpenSansSemibold"
                            TextColor="{StaticResource TextCharcoal}"
                            HorizontalOptions="Center"
                            Margin="0,0,0,8" />
-                    <Label Text="All items in this list will also be permanently deleted."
+                    <Label Text="{Binding Loc.DeleteListMessage}"
                            FontSize="14"
                            FontFamily="OpenSansRegular"
                            TextColor="{StaticResource SubtleGray}"
                            HorizontalOptions="Center"
                            HorizontalTextAlignment="Center"
                            Margin="0,0,0,24" />
-                    <Button Text="Delete"
+                    <Button Text="{Binding Loc.Delete}"
                             BackgroundColor="{StaticResource DangerRed}"
                             TextColor="White"
                             FontFamily="OpenSansSemibold"
@@ -542,7 +542,7 @@
                             HorizontalOptions="Fill"
                             Command="{Binding ConfirmDeleteListCommand}"
                             Margin="0,0,0,10" />
-                    <Button Text="Cancel"
+                    <Button Text="{Binding Loc.Cancel}"
                             Style="{StaticResource GhostButton}"
                             HorizontalOptions="Fill"
                             Command="{Binding CancelDeleteListCommand}" />

@@ -34,6 +34,7 @@ public static class MauiProgram
         builder.Services.AddSingleton<IShoppingListService, ShoppingListService>();
         builder.Services.AddSingleton<IShoppingItemService, ShoppingItemService>();
         builder.Services.AddSingleton<ICategoryService, CategoryService>();
+        builder.Services.AddSingleton<ILocalizationService, LocalizationService>();
 
         // ── ViewModels ───────────────────────────────────────────────────────
         builder.Services.AddTransient<ListsDashboardViewModel>();

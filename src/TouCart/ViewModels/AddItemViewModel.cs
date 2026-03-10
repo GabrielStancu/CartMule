@@ -12,6 +12,9 @@ public partial class AddItemViewModel : BaseViewModel
 {
     private readonly IShoppingItemService _itemService;
     private readonly ICategoryService _categoryService;
+    private readonly ILocalizationService _loc;
+
+    public ILocalizationService Loc => _loc;
 
     public ObservableCollection<Category> Categories { get; } = [];
 
@@ -33,10 +36,11 @@ public partial class AddItemViewModel : BaseViewModel
 
     public bool IsEditMode => ItemId > 0;
 
-    public AddItemViewModel(IShoppingItemService itemService, ICategoryService categoryService)
+    public AddItemViewModel(IShoppingItemService itemService, ICategoryService categoryService, ILocalizationService loc)
     {
         _itemService = itemService;
         _categoryService = categoryService;
+        _loc = loc;
     }
 
     [RelayCommand]
@@ -48,12 +52,12 @@ public partial class AddItemViewModel : BaseViewModel
             var cats = await _categoryService.GetAllCategoriesAsync();
             Categories.Clear();
             foreach (var c in cats)
-                Categories.Add(c);
+                Categories.Add(new Models.Category { Id = c.Id, Name = _loc.TranslateCategoryName(c.Name), SortOrder = c.SortOrder });
 
             if (IsEditMode)
             {
-                Title    = "Edit Item";
-                Subtitle = "Update item details";
+                Title    = _loc.EditItemTitle;
+                Subtitle = _loc.EditItemSubtitle;
                 // Pre-populate fields from existing item
                 var items = await _itemService.GetItemsForListAsync(ListId);
                 var existing = items.FirstOrDefault(i => i.Id == ItemId);
@@ -67,9 +71,9 @@ public partial class AddItemViewModel : BaseViewModel
             }
             else
             {
-                Title    = "Add Item";
-                Subtitle = "Add item to your list";
-                SelectedCategory = Categories.FirstOrDefault(c => c.Name == "Other")
+                Title    = _loc.AddItemTitle;
+                Subtitle = _loc.AddItemSubtitle;
+                SelectedCategory = Categories.FirstOrDefault(c => c.Id == 8)
                                    ?? Categories.FirstOrDefault();
             }
         }

@@ -30,6 +30,9 @@ public partial class AddListViewModel : BaseViewModel
 {
     private readonly IShoppingListService _listService;
     private readonly ICategoryService     _categoryService;
+    private readonly ILocalizationService _loc;
+
+    public ILocalizationService Loc => _loc;
 
     public int  ListId       { get; set; }
     public bool IsCreateMode => ListId == 0;
@@ -61,22 +64,23 @@ public partial class AddListViewModel : BaseViewModel
             .Where(s => !string.IsNullOrWhiteSpace(s.Name))
             .Select(s => s.Name.Trim()));
 
-    public AddListViewModel(IShoppingListService listService, ICategoryService categoryService)
+    public AddListViewModel(IShoppingListService listService, ICategoryService categoryService, ILocalizationService loc)
     {
         _listService     = listService;
         _categoryService = categoryService;
+        _loc             = loc;
     }
 
     [RelayCommand]
     async Task InitialiseAsync()
     {
-        Title    = IsCreateMode ? "New List" : "Edit List";
-        Subtitle = IsCreateMode ? "Create a new shopping list" : "Update list details";
+        Title    = IsCreateMode ? _loc.NewListTitle   : _loc.EditListTitle;
+        Subtitle = IsCreateMode ? _loc.NewListSubtitle : _loc.EditListSubtitle;
 
         var categories = await _categoryService.GetAllCategoriesAsync();
         Categories.Clear();
         foreach (var c in categories)
-            AddCategoryItem(new CategoryEditItem { Id = c.Id, Name = c.Name });
+            AddCategoryItem(new CategoryEditItem { Id = c.Id, Name = _loc.TranslateCategoryName(c.Name) });
         EnsureBlankTrailingCategory();
 
         Shops.Clear();

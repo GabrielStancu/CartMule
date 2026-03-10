@@ -74,7 +74,7 @@
             <VerticalStackLayout Spacing="0" Padding="20,24,20,40">
 
                 <!-- Item name -->
-                <Label Text="Item Name"
+                <Label Text="{Binding Loc.ItemNameLabel}"
                        TextColor="{StaticResource SubtleGray}"
                        FontFamily="OpenSansRegular"
                        FontSize="13"
@@ -83,12 +83,12 @@
                         Margin="0,0,0,20">
                     <Entry Text="{Binding Name}"
                            Style="{StaticResource RoundedInputField}"
-                           Placeholder="e.g. Whole milk"
+                           Placeholder="{Binding Loc.ItemNamePlaceholder}"
                            ReturnType="Next" />
                 </Border>
 
                 <!-- Quantity -->
-                <Label Text="Quantity (optional)"
+                <Label Text="{Binding Loc.QuantityLabel}"
                        TextColor="{StaticResource SubtleGray}"
                        FontFamily="OpenSansRegular"
                        FontSize="13"
@@ -97,12 +97,12 @@
                         Margin="0,0,0,20">
                     <Entry Text="{Binding Quantity}"
                            Style="{StaticResource RoundedInputField}"
-                           Placeholder="e.g. 2 litres"
+                           Placeholder="{Binding Loc.QuantityPlaceholder}"
                            ReturnType="Done" />
                 </Border>
 
                 <!-- Category -->
-                <Label Text="Category"
+                <Label Text="{Binding Loc.CategoryLabel}"
                        TextColor="{StaticResource SubtleGray}"
                        FontFamily="OpenSansRegular"
                        FontSize="13"
@@ -116,7 +116,7 @@
                 </Border>
 
                 <!-- Save button -->
-                <Button Text="Save"
+                <Button Text="{Binding Loc.Save}"
                         BackgroundColor="{StaticResource PrimaryYellow}"
                         TextColor="{StaticResource TextCharcoal}"
                         FontFamily="OpenSansSemibold"
@@ -128,7 +128,7 @@
                         Margin="0,0,0,12" />
 
                 <!-- Cancel -->
-                <Button Text="Cancel"
+                <Button Text="{Binding Loc.Cancel}"
                         Style="{StaticResource GhostButton}"
                         HorizontalOptions="Fill"
                         Command="{Binding CancelCommand}" />

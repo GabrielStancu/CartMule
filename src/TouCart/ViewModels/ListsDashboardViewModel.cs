@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using TouCart.Models;
@@ -8,21 +9,20 @@ namespace TouCart.ViewModels;
 
 public sealed class ListSummaryItem
 {
-    public ShoppingList List { get; init; } = default!;
-    public int ItemCount { get; init; }
-    public string CreatedDisplay =>
-        List.CreatedAt.ToLocalTime().ToString("MMM d");
-
-    public string UpdatedDisplay =>
-        List.UpdatedAt == default
-            ? "New"
-            : List.UpdatedAt.ToLocalTime().ToString("MMM d");
+    public ShoppingList List         { get; init; } = default!;
+    public int          ItemCount    { get; init; }
+    public string       ItemCountDisplay { get; init; } = string.Empty;
+    public string       CreatedDisplay   { get; init; } = string.Empty;
+    public string       UpdatedDisplay   { get; init; } = string.Empty;
 }
 
 public partial class ListsDashboardViewModel : BaseViewModel
 {
     private readonly IShoppingListService _listService;
+    private readonly ILocalizationService _loc;
     private readonly List<ListSummaryItem> _allLists = [];
+
+    public ILocalizationService Loc => _loc;
 
     public ObservableCollection<ListSummaryItem> FilteredLists { get; } = [];
 
@@ -35,12 +35,22 @@ public partial class ListsDashboardViewModel : BaseViewModel
     [ObservableProperty]
     string _searchQuery = string.Empty;
 
+    [ObservableProperty]
+    bool _showLanguagePicker;
+
     partial void OnSearchQueryChanged(string value) => ApplyFilter();
 
-    public ListsDashboardViewModel(IShoppingListService listService)
+    public ListsDashboardViewModel(IShoppingListService listService, ILocalizationService loc)
     {
         _listService = listService;
+        _loc = loc;
         Title = "TouCart";
+        _loc.PropertyChanged += OnLocChanged;
+    }
+
+    private async void OnLocChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        await LoadListsAsync();
     }
 
     [RelayCommand]
@@ -55,7 +65,16 @@ public partial class ListsDashboardViewModel : BaseViewModel
             foreach (var list in lists)
             {
                 var count = await _listService.GetItemCountAsync(list.Id);
-                _allLists.Add(new ListSummaryItem { List = list, ItemCount = count });
+                _allLists.Add(new ListSummaryItem
+                {
+                    List             = list,
+                    ItemCount        = count,
+                    ItemCountDisplay = _loc.FormatItemCount(count),
+                    CreatedDisplay   = list.CreatedAt.ToLocalTime().ToString("MMM d"),
+                    UpdatedDisplay   = list.UpdatedAt == default
+                                       ? _loc.New
+                                       : list.UpdatedAt.ToLocalTime().ToString("MMM d")
+                });
             }
             ApplyFilter();
         }
@@ -118,4 +137,17 @@ public partial class ListsDashboardViewModel : BaseViewModel
     {
         await Shell.Current.GoToAsync($"listdetail?id={item.List.Id}");
     }
+
+    [RelayCommand]
+    void OpenLanguagePicker() => ShowLanguagePicker = true;
+
+    [RelayCommand]
+    void SelectLanguage(string code)
+    {
+        _loc.SetLanguage(code);
+        ShowLanguagePicker = false;
+    }
+
+    [RelayCommand]
+    void CloseLanguagePicker() => ShowLanguagePicker = false;
 }

@@ -78,7 +78,7 @@
                     <VerticalStackLayout Spacing="0" Padding="20,24,20,40">
 
                         <!-- List name -->
-                        <Label Text="List Name"
+                        <Label Text="{Binding Loc.ListNameLabel}"
                                TextColor="{StaticResource SubtleGray}"
                                FontFamily="OpenSansRegular"
                                FontSize="13"
@@ -87,12 +87,12 @@
                                 Margin="0,0,0,24">
                             <Entry Text="{Binding Name}"
                                    Style="{StaticResource RoundedInputField}"
-                                   Placeholder="e.g. Weekly Groceries"
+                                   Placeholder="{Binding Loc.ListNamePlaceholder}"
                                    ReturnType="Next" />
                         </Border>
 
                         <!-- Shops heading -->
-                        <Label Text="Shops (optional)"
+                        <Label Text="{Binding Loc.ShopsLabel}"
                                TextColor="{StaticResource SubtleGray}"
                                FontFamily="OpenSansRegular"
                                FontSize="13"
@@ -111,7 +111,7 @@
                                             <Entry Grid.Column="0"
                                                    Text="{Binding Name}"
                                                    Style="{StaticResource RoundedInputField}"
-                                                   Placeholder="Add a shop…"
+                                                   Placeholder="{Binding Source={RelativeSource AncestorType={x:Type vm:AddListViewModel}}, Path=Loc.AddShopPlaceholder}"
                                                    Margin="16,0,0,0"
                                                    ReturnType="Next"
                                                    Unfocused="OnShopUnfocused" />
@@ -144,7 +144,7 @@
                         </CollectionView>
 
                         <!-- Categories heading -->
-                        <Label Text="Categories"
+                        <Label Text="{Binding Loc.CategoriesLabel}"
                                TextColor="{StaticResource SubtleGray}"
                                FontFamily="OpenSansRegular"
                                FontSize="13"
@@ -163,7 +163,7 @@
                                             <Entry Grid.Column="0"
                                                    Text="{Binding Name}"
                                                    Style="{StaticResource RoundedInputField}"
-                                                   Placeholder="Add a category…"
+                                                   Placeholder="{Binding Source={RelativeSource AncestorType={x:Type vm:AddListViewModel}}, Path=Loc.AddCategoryPlaceholder}"
                                                    Margin="16,0,0,0"
                                                    ReturnType="Next"
                                                    Unfocused="OnCategoryUnfocused" />
@@ -196,7 +196,7 @@
                         </CollectionView>
 
                         <!-- Save -->
-                        <Button Text="Save"
+                        <Button Text="{Binding Loc.Save}"
                                 BackgroundColor="{StaticResource PrimaryYellow}"
                                 TextColor="{StaticResource TextCharcoal}"
                                 FontFamily="OpenSansSemibold"
@@ -208,7 +208,7 @@
                                 Margin="0,0,0,12" />
 
                         <!-- Cancel (create mode only) -->
-                        <Button Text="Cancel"
+                        <Button Text="{Binding Loc.Cancel}"
                                 Style="{StaticResource GhostButton}"
                                 HorizontalOptions="Fill"
                                 IsVisible="{Binding IsCreateMode}"
@@ -216,7 +216,7 @@
                                 Margin="0,0,0,12" />
 
                         <!-- Delete list (edit mode only) -->
-                        <Button Text="Delete List"
+                        <Button Text="{Binding Loc.DeleteListBtn}"
                                 BackgroundColor="{StaticResource DangerRed}"
                                 TextColor="White"
                                 FontFamily="OpenSansSemibold"
@@ -245,7 +245,7 @@
                     <RoundRectangle CornerRadius="20" />
                 </Border.StrokeShape>
                 <VerticalStackLayout Spacing="0" Padding="24">
-                    <Label Text="Edit"
+                    <Label Text="{Binding Loc.EditModalTitle}"
                            FontSize="18"
                            FontAttributes="Bold"
                            FontFamily="OpenSansSemibold"
@@ -258,7 +258,7 @@
                                Style="{StaticResource RoundedInputField}"
                                ReturnType="Done" />
                     </Border>
-                    <Button Text="Save"
+                    <Button Text="{Binding Loc.Save}"
                             BackgroundColor="{StaticResource PrimaryYellow}"
                             TextColor="{StaticResource TextCharcoal}"
                             FontFamily="OpenSansSemibold"
@@ -268,7 +268,7 @@
                             HorizontalOptions="Fill"
                             Command="{Binding SaveEditModalCommand}"
                             Margin="0,0,0,10" />
-                    <Button Text="Delete"
+                    <Button Text="{Binding Loc.Delete}"
                             BackgroundColor="{StaticResource DangerRed}"
                             TextColor="White"
                             FontFamily="OpenSansSemibold"
@@ -278,7 +278,7 @@
                             HorizontalOptions="Fill"
                             Command="{Binding DeleteEditModalItemCommand}"
                             Margin="0,0,0,10" />
-                    <Button Text="Cancel"
+                    <Button Text="{Binding Loc.Cancel}"
                             Style="{StaticResource GhostButton}"
                             HorizontalOptions="Fill"
                             Command="{Binding CancelEditModalCommand}" />
@@ -298,21 +298,21 @@
                     <RoundRectangle CornerRadius="20" />
                 </Border.StrokeShape>
                 <VerticalStackLayout Spacing="0" Padding="24">
-                    <Label Text="Delete this list?"
+                    <Label Text="{Binding Loc.DeleteListTitle}"
                            FontSize="18"
                            FontAttributes="Bold"
                            FontFamily="OpenSansSemibold"
                            TextColor="{StaticResource TextCharcoal}"
                            HorizontalOptions="Center"
                            Margin="0,0,0,8" />
-                    <Label Text="All items in this list will also be permanently deleted."
+                    <Label Text="{Binding Loc.DeleteListMessage}"
                            FontSize="14"
                            FontFamily="OpenSansRegular"
                            TextColor="{StaticResource SubtleGray}"
                            HorizontalOptions="Center"
                            HorizontalTextAlignment="Center"
                            Margin="0,0,0,24" />
-                    <Button Text="Delete"
+                    <Button Text="{Binding Loc.Delete}"
                             BackgroundColor="{StaticResource DangerRed}"
                             TextColor="White"
                             FontFamily="OpenSansSemibold"
@@ -322,7 +322,7 @@
                             HorizontalOptions="Fill"
                             Command="{Binding ConfirmDeleteListCommand}"
                             Margin="0,0,0,10" />
-                    <Button Text="Cancel"
+                    <Button Text="{Binding Loc.Cancel}"
                             Style="{StaticResource GhostButton}"
                             HorizontalOptions="Fill"
                             Command="{Binding CancelDeleteListCommand}" />
