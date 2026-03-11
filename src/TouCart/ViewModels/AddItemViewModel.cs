@@ -31,6 +31,9 @@ public partial class AddItemViewModel : BaseViewModel
     [ObservableProperty]
     Category? _selectedCategory;
 
+    [ObservableProperty]
+    bool _showCategoryPicker;
+
     public int ListId { get; set; }
     public int ItemId { get; set; }
 
@@ -116,6 +119,19 @@ public partial class AddItemViewModel : BaseViewModel
             IsBusy = false;
         }
     }
+
+    [RelayCommand]
+    void OpenCategoryPicker() => ShowCategoryPicker = true;
+
+    [RelayCommand]
+    void SelectCategory(int id)
+    {
+        SelectedCategory = Categories.FirstOrDefault(c => c.Id == id);
+        ShowCategoryPicker = false;
+    }
+
+    [RelayCommand]
+    void CloseCategoryPicker() => ShowCategoryPicker = false;
 
     [RelayCommand]
     static async Task CancelAsync() =>

@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:TouCart.ViewModels"
              xmlns:converters="clr-namespace:TouCart.Converters"
+             xmlns:models="clr-namespace:TouCart.Models"
              x:Class="TouCart.Views.AddItemPage"
              x:DataType="vm:AddItemViewModel"
              Shell.NavBarIsVisible="False"
@@ -12,6 +13,7 @@
         <converters:AdaptiveFontSizeConverter x:Key="TitleFontSize" />
     </ContentPage.Resources>
 
+    <Grid>
     <Grid RowDefinitions="{OnPlatform iOS='182,*', Default='154,*'}">
 
         <!-- ── Yellow header ─────────────────────────────────────────── -->
@@ -109,10 +111,22 @@
                        Margin="4,0,0,6" />
                 <Border Style="{StaticResource InputBorder}"
                         Margin="0,0,0,32">
-                    <Picker ItemsSource="{Binding Categories}"
-                            SelectedItem="{Binding SelectedCategory}"
-                            Style="{StaticResource RoundedPicker}"
-                            ItemDisplayBinding="{Binding Name}" />
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding OpenCategoryPickerCommand}" />
+                    </Border.GestureRecognizers>
+                    <Grid ColumnDefinitions="*,Auto" HeightRequest="52">
+                        <Label Grid.Column="0"
+                               Text="{Binding SelectedCategory.Name}"
+                               FontFamily="OpenSansRegular"
+                               FontSize="16"
+                               TextColor="{StaticResource TextCharcoal}"
+                               VerticalOptions="Center" />
+                        <Label Grid.Column="1"
+                               Text="&#x25BE;"
+                               FontSize="14"
+                               TextColor="{StaticResource SubtleGray}"
+                               VerticalOptions="Center" />
+                    </Grid>
                 </Border>
 
                 <!-- Save button -->
@@ -136,6 +150,53 @@
             </VerticalStackLayout>
             </ScrollView>
         </Border>
+
+    </Grid>
+
+        <!-- ── Category picker modal ─────────────────────────────────── -->
+        <Grid IsVisible="{Binding ShowCategoryPicker}"
+              BackgroundColor="#80000000">
+            <Border HorizontalOptions="Center"
+                    VerticalOptions="Center"
+                    BackgroundColor="White"
+                    StrokeThickness="0"
+                    WidthRequest="300">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="20" />
+                </Border.StrokeShape>
+                <VerticalStackLayout Spacing="0" Padding="24">
+                    <Label Text="{Binding Loc.CategoryLabel}"
+                           FontSize="18"
+                           FontAttributes="Bold"
+                           FontFamily="OpenSansSemibold"
+                           TextColor="{StaticResource TextCharcoal}"
+                           HorizontalOptions="Center"
+                           Margin="0,0,0,20" />
+                    <VerticalStackLayout Spacing="10"
+                                         BindableLayout.ItemsSource="{Binding Categories}">
+                        <BindableLayout.ItemTemplate>
+                            <DataTemplate x:DataType="models:Category">
+                                <Button Text="{Binding Name}"
+                                        BackgroundColor="{StaticResource PrimaryYellow}"
+                                        TextColor="{StaticResource TextCharcoal}"
+                                        FontFamily="OpenSansSemibold"
+                                        FontSize="15"
+                                        CornerRadius="12"
+                                        HeightRequest="48"
+                                        HorizontalOptions="Fill"
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type vm:AddItemViewModel}}, Path=SelectCategoryCommand}"
+                                        CommandParameter="{Binding Id}" />
+                            </DataTemplate>
+                        </BindableLayout.ItemTemplate>
+                    </VerticalStackLayout>
+                    <Button Text="{Binding Loc.Cancel}"
+                            Style="{StaticResource GhostButton}"
+                            HorizontalOptions="Fill"
+                            Margin="0,10,0,0"
+                            Command="{Binding CloseCategoryPickerCommand}" />
+                </VerticalStackLayout>
+            </Border>
+        </Grid>
 
     </Grid>
 </ContentPage>

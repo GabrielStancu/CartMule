@@ -221,9 +221,9 @@
                                                     <VerticalStackLayout VerticalOptions="Center"
                                                                          HorizontalOptions="Center"
                                                                          Spacing="4">
-                                                        <Label Text="&#x1F5D1;"
-                                                               TextColor="White"
-                                                               FontSize="20"
+                                                        <Image Source="delete_icon.png"
+                                                               WidthRequest="20"
+                                                               HeightRequest="20"
                                                                HorizontalOptions="Center" />
                                                         <Label Text="{Binding Source={RelativeSource AncestorType={x:Type vm:ListDetailViewModel}}, Path=Loc.Delete}"
                                                                TextColor="White"
@@ -238,18 +238,28 @@
 
                                     <VerticalStackLayout BackgroundColor="White">
                                         <VerticalStackLayout.Triggers>
+                                            <!-- Dragged: muted placeholder look so the hovering ghost reads as the real card -->
                                             <DataTrigger TargetType="VerticalStackLayout"
                                                          Binding="{Binding IsDragging}"
                                                          Value="True">
-                                                <Setter Property="Opacity" Value="0.4" />
+                                                <Setter Property="BackgroundColor" Value="#F0F0F0" />
+                                                <Setter Property="Opacity" Value="0.5" />
                                             </DataTrigger>
                                         </VerticalStackLayout.Triggers>
                                         <VerticalStackLayout.GestureRecognizers>
                                             <DropGestureRecognizer
                                                 AllowDrop="True"
+                                                DragOver="OnItemDragOver"
+                                                DragLeave="OnItemDragLeave"
                                                 DropCommand="{Binding Source={RelativeSource AncestorType={x:Type vm:ListDetailViewModel}}, Path=ItemDroppedCommand}"
                                                 DropCommandParameter="{Binding}" />
                                         </VerticalStackLayout.GestureRecognizers>
+
+                                        <!-- Insertion indicator: yellow bar appears above this item while being dragged over -->
+                                        <BoxView BackgroundColor="{StaticResource PrimaryYellow}"
+                                                 HeightRequest="4"
+                                                 IsVisible="{Binding IsDropTarget}"
+                                                 Margin="60,0,0,0" />
 
                                         <Grid ColumnDefinitions="32,48,*,44"
                                               ColumnSpacing="0"

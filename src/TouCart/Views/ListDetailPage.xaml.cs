@@ -33,4 +33,16 @@ public partial class ListDetailPage : ContentPage
     {
         await Shell.Current.GoToAsync($"addlist?listId={_viewModel.ListId}");
     }
+
+    private void OnItemDragOver(object sender, DragEventArgs e)
+    {
+        if (sender is DropGestureRecognizer { BindingContext: ShoppingItemViewModel vm })
+            _viewModel.ItemDragEntered(vm);
+    }
+
+    private void OnItemDragLeave(object sender, DragEventArgs e)
+    {
+        if (sender is DropGestureRecognizer { BindingContext: ShoppingItemViewModel vm })
+            _viewModel.ItemDragLeft(vm);
+    }
 }

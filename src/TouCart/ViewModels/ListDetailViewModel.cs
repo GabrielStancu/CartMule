@@ -14,6 +14,9 @@ public partial class ShoppingItemViewModel : ObservableObject
     [ObservableProperty]
     bool _isDragging;
 
+    [ObservableProperty]
+    bool _isDropTarget;
+
     public ShoppingItemViewModel(ShoppingItem source) => Source = source;
 
     // Forward properties so XAML bindings need no changes
@@ -54,6 +57,7 @@ public partial class ListDetailViewModel : BaseViewModel
     private List<ShoppingItemViewModel> _allItemVms = new();
     private Dictionary<int, string>     _cachedCatNames = new();
     private ShoppingItemViewModel?      _draggedVm;
+    private ShoppingItemViewModel?      _dropTargetVm;
     private ShoppingItemViewModel?      _selectedVm;
 
     [ObservableProperty]
@@ -273,6 +277,7 @@ public partial class ListDetailViewModel : BaseViewModel
     void ItemDragStarted(ShoppingItemViewModel vm)
     {
         if (_draggedVm is not null) _draggedVm.IsDragging = false;
+        ClearDropTarget();
         _draggedVm = vm;
         vm.IsDragging = true;
     }
@@ -280,13 +285,41 @@ public partial class ListDetailViewModel : BaseViewModel
     [RelayCommand]
     void ItemDragCompleted(ShoppingItemViewModel vm)
     {
+        ClearDropTarget();
         if (_draggedVm is not null) _draggedVm.IsDragging = false;
         _draggedVm = null;
+    }
+
+    /// <summary>Called from code-behind DragOver event on each drop target.</summary>
+    public void ItemDragEntered(ShoppingItemViewModel vm)
+    {
+        if (_draggedVm is null || ReferenceEquals(_draggedVm, vm)) return;
+        if (ReferenceEquals(_dropTargetVm, vm)) return;
+        ClearDropTarget();
+        _dropTargetVm      = vm;
+        vm.IsDropTarget    = true;
+    }
+
+    /// <summary>Called from code-behind DragLeave event on each drop target.</summary>
+    public void ItemDragLeft(ShoppingItemViewModel vm)
+    {
+        vm.IsDropTarget = false;
+        if (ReferenceEquals(_dropTargetVm, vm))
+            _dropTargetVm = null;
+    }
+
+    private void ClearDropTarget()
+    {
+        if (_dropTargetVm is null) return;
+        _dropTargetVm.IsDropTarget = false;
+        _dropTargetVm = null;
     }
 
     [RelayCommand]
     async Task ItemDropped(ShoppingItemViewModel target)
     {
+        ClearDropTarget();
+
         if (_draggedVm is null || ReferenceEquals(_draggedVm, target))
         {
             if (_draggedVm is not null) _draggedVm.IsDragging = false;
