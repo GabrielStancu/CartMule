@@ -15,11 +15,17 @@ public class CategoryService : ICategoryService
     public Task<List<Category>> GetAllCategoriesAsync() =>
         _categoryRepo.GetAllAsync();
 
+    public Task<List<Category>> GetCategoriesForListAsync(int listId) =>
+        _categoryRepo.GetForListAsync(listId);
+
     public Task<Category?> GetCategoryByIdAsync(int id) =>
         _categoryRepo.GetByIdAsync(id);
 
     public Task<Category> CreateCategoryAsync(string name) =>
         _categoryRepo.CreateAsync(new Category { Name = name.Trim() });
+
+    public Task<Category> CreateCategoryForListAsync(string name, int listId) =>
+        _categoryRepo.CreateAsync(new Category { Name = name.Trim(), ListId = listId });
 
     public async Task<Category> UpdateCategoryAsync(int id, string name)
     {

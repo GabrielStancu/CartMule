@@ -88,6 +88,9 @@ public sealed class LocalizationService : ILocalizationService
     public string AddCategoryPlaceholder => Ro ? "Adaugă o categorie…"              : "Add a category…";
     public string DeleteListBtn          => Ro ? "Șterge lista"                     : "Delete List";
     public string EditModalTitle         => Ro ? "Editează"                         : "Edit";
+    public string Default                => Ro ? "Implicit"                         : "Default";
+    public string DefaultCategoriesTitle => Ro ? "Categorii implicite"              : "Default Categories";
+    public string Ok                     => "OK";
 
     // ── Language picker ───────────────────────────────────────────────────────
     public string ChooseLanguage => Ro ? "Alege Limba" : "Choose Language";

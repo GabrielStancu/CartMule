@@ -143,12 +143,65 @@
                             </CollectionView.ItemTemplate>
                         </CollectionView>
 
-                        <!-- Categories heading -->
-                        <Label Text="{Binding Loc.CategoriesLabel}"
-                               TextColor="{StaticResource SubtleGray}"
-                               FontFamily="OpenSansRegular"
-                               FontSize="13"
-                               Margin="4,0,0,10" />
+                        <!-- Categories heading (with Default toggle in create mode) -->
+                        <Grid ColumnDefinitions="*,Auto" Margin="4,0,0,10">
+                            <Label Grid.Column="0"
+                                   Text="{Binding Loc.CategoriesLabel}"
+                                   TextColor="{StaticResource SubtleGray}"
+                                   FontFamily="OpenSansRegular"
+                                   FontSize="13"
+                                   VerticalOptions="Center" />
+
+                            <!-- Default label + toggle (create mode only) -->
+                            <HorizontalStackLayout Grid.Column="1"
+                                                   Spacing="8"
+                                                   VerticalOptions="Center"
+                                                   IsVisible="{Binding IsCreateMode}">
+                                <Label Text="{Binding Loc.Default}"
+                                       TextColor="{StaticResource SubtleGray}"
+                                       FontFamily="OpenSansRegular"
+                                       FontSize="13"
+                                       VerticalOptions="Center" />
+                                <!-- Toggle track -->
+                                <Border WidthRequest="50"
+                                        HeightRequest="28"
+                                        StrokeThickness="0"
+                                        BackgroundColor="{StaticResource TextCharcoal}"
+                                        VerticalOptions="Center">
+                                    <Border.StrokeShape>
+                                        <RoundRectangle CornerRadius="14" />
+                                    </Border.StrokeShape>
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding ToggleDefaultCategoriesCommand}" />
+                                    </Border.GestureRecognizers>
+                                    <Border.Triggers>
+                                        <DataTrigger TargetType="Border"
+                                                     Binding="{Binding DefaultsEnabled}"
+                                                     Value="True">
+                                            <Setter Property="BackgroundColor" Value="{StaticResource PrimaryYellow}" />
+                                        </DataTrigger>
+                                    </Border.Triggers>
+                                    <!-- Thumb -->
+                                    <Grid>
+                                        <Ellipse WidthRequest="22"
+                                                 HeightRequest="22"
+                                                 Fill="White"
+                                                 HorizontalOptions="Start"
+                                                 VerticalOptions="Center"
+                                                 Margin="3,0,0,0">
+                                            <Ellipse.Triggers>
+                                                <DataTrigger TargetType="Ellipse"
+                                                             Binding="{Binding DefaultsEnabled}"
+                                                             Value="True">
+                                                    <Setter Property="HorizontalOptions" Value="End" />
+                                                    <Setter Property="Margin" Value="0,0,3,0" />
+                                                </DataTrigger>
+                                            </Ellipse.Triggers>
+                                        </Ellipse>
+                                    </Grid>
+                                </Border>
+                            </HorizontalStackLayout>
+                        </Grid>
 
                         <!-- Category rows (auto-expanding) -->
                         <CollectionView ItemsSource="{Binding Categories}"
@@ -326,6 +379,84 @@
                             Style="{StaticResource GhostButton}"
                             HorizontalOptions="Fill"
                             Command="{Binding CancelDeleteListCommand}" />
+                </VerticalStackLayout>
+            </Border>
+        </Grid>
+
+        <!-- ── Default categories modal (create mode only) ────────────────────── -->
+        <Grid IsVisible="{Binding ShowDefaultCategoriesModal}"
+              BackgroundColor="#80000000">
+            <Border HorizontalOptions="Center"
+                    VerticalOptions="Center"
+                    BackgroundColor="White"
+                    StrokeThickness="0"
+                    WidthRequest="300">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="20" />
+                </Border.StrokeShape>
+                <VerticalStackLayout Spacing="0" Padding="24">
+                    <Label Text="{Binding Loc.DefaultCategoriesTitle}"
+                           FontSize="18"
+                           FontAttributes="Bold"
+                           FontFamily="OpenSansSemibold"
+                           TextColor="{StaticResource TextCharcoal}"
+                           HorizontalOptions="Center"
+                           Margin="0,0,0,20" />
+                    <VerticalStackLayout BindableLayout.ItemsSource="{Binding DefaultCategoryOptions}"
+                                         Spacing="0">
+                        <BindableLayout.ItemTemplate>
+                            <DataTemplate x:DataType="vm:DefaultCategoryOption">
+                                <Grid ColumnDefinitions="44,*"
+                                      Padding="0,8">
+                                    <Border Grid.Column="0"
+                                            WidthRequest="24"
+                                            HeightRequest="24"
+                                            StrokeThickness="2"
+                                            Stroke="{StaticResource TextCharcoal}"
+                                            BackgroundColor="Transparent"
+                                            VerticalOptions="Center"
+                                            HorizontalOptions="Center">
+                                        <Border.GestureRecognizers>
+                                            <TapGestureRecognizer
+                                                Command="{Binding Source={RelativeSource AncestorType={x:Type vm:AddListViewModel}}, Path=ToggleDefaultOptionCommand}"
+                                                CommandParameter="{Binding}" />
+                                        </Border.GestureRecognizers>
+                                        <Border.StrokeShape>
+                                            <Ellipse />
+                                        </Border.StrokeShape>
+                                        <Border.Triggers>
+                                            <DataTrigger TargetType="Border"
+                                                         Binding="{Binding IsSelected}"
+                                                         Value="True">
+                                                <Setter Property="BackgroundColor" Value="{StaticResource TextCharcoal}" />
+                                                <Setter Property="Stroke" Value="{StaticResource TextCharcoal}" />
+                                            </DataTrigger>
+                                        </Border.Triggers>
+                                    </Border>
+                                    <Label Grid.Column="1"
+                                           Text="{Binding Name}"
+                                           FontFamily="OpenSansRegular"
+                                           FontSize="15"
+                                           TextColor="{StaticResource TextCharcoal}"
+                                           VerticalOptions="Center" />
+                                </Grid>
+                            </DataTemplate>
+                        </BindableLayout.ItemTemplate>
+                    </VerticalStackLayout>
+                    <Button Text="{Binding Loc.Ok}"
+                            BackgroundColor="{StaticResource PrimaryYellow}"
+                            TextColor="{StaticResource TextCharcoal}"
+                            FontFamily="OpenSansSemibold"
+                            FontSize="15"
+                            CornerRadius="12"
+                            HeightRequest="48"
+                            HorizontalOptions="Fill"
+                            Command="{Binding ConfirmDefaultCategoriesCommand}"
+                            Margin="0,20,0,10" />
+                    <Button Text="{Binding Loc.Cancel}"
+                            Style="{StaticResource GhostButton}"
+                            HorizontalOptions="Fill"
+                            Command="{Binding CancelDefaultCategoriesCommand}" />
                 </VerticalStackLayout>
             </Border>
         </Grid>

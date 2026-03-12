@@ -135,7 +135,7 @@ public partial class ListDetailViewModel : BaseViewModel
                 ? _loc.FormatUpdated(list.UpdatedAt)
                 : string.Empty;
 
-            var categories  = await _categoryService.GetAllCategoriesAsync();
+            var categories  = await _categoryService.GetCategoriesForListAsync(ListId);
             _cachedCatNames = categories.ToDictionary(c => c.Id, c => _loc.TranslateCategoryName(c.Name));
             var items       = await _itemService.GetItemsForListAsync(ListId);
 

@@ -52,7 +52,7 @@ public partial class AddItemViewModel : BaseViewModel
         IsBusy = true;
         try
         {
-            var cats = await _categoryService.GetAllCategoriesAsync();
+            var cats = await _categoryService.GetCategoriesForListAsync(ListId);
             Categories.Clear();
             foreach (var c in cats)
                 Categories.Add(new Models.Category { Id = c.Id, Name = _loc.TranslateCategoryName(c.Name), SortOrder = c.SortOrder });
@@ -76,7 +76,7 @@ public partial class AddItemViewModel : BaseViewModel
             {
                 Title    = _loc.AddItemTitle;
                 Subtitle = _loc.AddItemSubtitle;
-                SelectedCategory = Categories.FirstOrDefault(c => c.Id == 8)
+                SelectedCategory = Categories.FirstOrDefault(c => c.Name == _loc.TranslateCategoryName("Other"))
                                    ?? Categories.FirstOrDefault();
             }
         }

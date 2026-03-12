@@ -8,41 +8,17 @@
              BackgroundColor="{StaticResource PrimaryYellow}">
 
     <Grid>
-    <Grid RowDefinitions="Auto,*">
+    <Grid RowDefinitions="{OnPlatform iOS='182,*', Default='154,*'}">
 
         <!-- ── Hero header ───────────────────────────────────────────── -->
         <Grid Grid.Row="0"
-              ColumnDefinitions="*,Auto"
+              ColumnDefinitions="*,Auto,Auto"
               Padding="{OnPlatform iOS='24,52,16,0', Default='24,24,16,0'}">
 
             <VerticalStackLayout Grid.Column="0"
                                  VerticalOptions="End"
                                  Spacing="2"
                                  Padding="0,0,0,28">
-
-                <!-- ── Language / flag picker button ──────────────────── -->
-                <Border BackgroundColor="#22000000"
-                        StrokeThickness="0"
-                        Padding="10,5"
-                        HorizontalOptions="Start"
-                        Margin="0,0,0,8">
-                    <Border.StrokeShape>
-                        <RoundRectangle CornerRadius="10" />
-                    </Border.StrokeShape>
-                    <Border.GestureRecognizers>
-                        <TapGestureRecognizer Command="{Binding OpenLanguagePickerCommand}" />
-                    </Border.GestureRecognizers>
-                    <HorizontalStackLayout Spacing="4">
-                        <Label Text="{Binding Loc.CurrentFlagEmoji}"
-                               FontSize="18"
-                               VerticalOptions="Center" />
-                        <Label Text="&#x25BE;"
-                               FontSize="13"
-                               TextColor="{StaticResource TextCharcoal}"
-                               Opacity="0.6"
-                               VerticalOptions="Center" />
-                    </HorizontalStackLayout>
-                </Border>
 
                 <Label Text="{Binding Loc.Hello}"
                        FontSize="34"
@@ -56,7 +32,33 @@
                        Opacity="0.7" />
             </VerticalStackLayout>
 
-            <Image Grid.Column="1"
+            <!-- ── Language / flag picker button ──────────────────── -->
+            <Border Grid.Column="1"
+                    BackgroundColor="#22000000"
+                    StrokeThickness="0"
+                    Padding="10,5"
+                    HorizontalOptions="End"
+                    VerticalOptions="End"
+                    Margin="0,0,8,34">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="10" />
+                </Border.StrokeShape>
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding OpenLanguagePickerCommand}" />
+                </Border.GestureRecognizers>
+                <HorizontalStackLayout Spacing="4">
+                    <Label Text="{Binding Loc.CurrentFlagEmoji}"
+                           FontSize="18"
+                           VerticalOptions="Center" />
+                    <Label Text="&#x25BE;"
+                           FontSize="13"
+                           TextColor="{StaticResource TextCharcoal}"
+                           Opacity="0.6"
+                           VerticalOptions="Center" />
+                </HorizontalStackLayout>
+            </Border>
+
+            <Image Grid.Column="2"
                    Source="shopping_bag.png"
                    HeightRequest="130"
                    WidthRequest="110"
@@ -199,7 +201,7 @@
                                         </VerticalStackLayout>
 
                                         <Border Grid.Column="1"
-                                                BackgroundColor="{StaticResource CalmGreen}"
+                                                BackgroundColor="{StaticResource TextCharcoal}"
                                                 WidthRequest="36"
                                                 HeightRequest="36"
                                                 StrokeThickness="0"

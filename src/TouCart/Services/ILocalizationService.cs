@@ -59,6 +59,9 @@ public interface ILocalizationService : INotifyPropertyChanged
     string AddCategoryPlaceholder  { get; }
     string DeleteListBtn           { get; }
     string EditModalTitle          { get; }
+    string Default                 { get; }
+    string DefaultCategoriesTitle  { get; }
+    string Ok                      { get; }
 
     // ── Language picker ───────────────────────────────────────────────────────
     string ChooseLanguage          { get; }

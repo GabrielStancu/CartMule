@@ -13,6 +13,9 @@ public class Category
     /// <summary>Controls display order in the list. Lower = higher priority.</summary>
     public int SortOrder { get; set; }
 
+    /// <summary>Links this category to a specific list. 0 = global legacy seed (not shown in UI).</summary>
+    public int ListId { get; set; }
+
     // Default seeded categories
     public static readonly IReadOnlyList<Category> Defaults =
     [

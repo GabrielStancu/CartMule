@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using TouCart.Models;
 using TouCart.Services;
 
 namespace TouCart.ViewModels;
@@ -11,6 +12,8 @@ public partial class CategoryEditItem : ObservableObject
 
     [ObservableProperty]
     string _name = string.Empty;
+
+    public bool IsFromDefault { get; set; }
 
     internal Action<CategoryEditItem>? NameChanged;
     partial void OnNameChanged(string value) => NameChanged?.Invoke(this);
@@ -23,6 +26,15 @@ public partial class ShopEditItem : ObservableObject
 
     internal Action<ShopEditItem>? NameChanged;
     partial void OnNameChanged(string value) => NameChanged?.Invoke(this);
+}
+
+public partial class DefaultCategoryOption : ObservableObject
+{
+    public string EnglishName { get; init; } = string.Empty;
+    public string Name        { get; init; } = string.Empty;
+
+    [ObservableProperty]
+    bool _isSelected = true;
 }
 
 [QueryProperty(nameof(ListId), "listId")]
@@ -53,6 +65,14 @@ public partial class AddListViewModel : BaseViewModel
     [ObservableProperty]
     string _modalEditName = string.Empty;
 
+    [ObservableProperty]
+    bool _defaultsEnabled;
+
+    [ObservableProperty]
+    bool _showDefaultCategoriesModal;
+
+    public ObservableCollection<DefaultCategoryOption> DefaultCategoryOptions { get; } = new();
+
     private CategoryEditItem? _modalCategory;
     private ShopEditItem?     _modalShop;
 
@@ -77,10 +97,13 @@ public partial class AddListViewModel : BaseViewModel
         Title    = IsCreateMode ? _loc.NewListTitle   : _loc.EditListTitle;
         Subtitle = IsCreateMode ? _loc.NewListSubtitle : _loc.EditListSubtitle;
 
-        var categories = await _categoryService.GetAllCategoriesAsync();
         Categories.Clear();
-        foreach (var c in categories)
-            AddCategoryItem(new CategoryEditItem { Id = c.Id, Name = _loc.TranslateCategoryName(c.Name) });
+        if (IsEditMode)
+        {
+            var categories = await _categoryService.GetCategoriesForListAsync(ListId);
+            foreach (var c in categories)
+                AddCategoryItem(new CategoryEditItem { Id = c.Id, Name = _loc.TranslateCategoryName(c.Name) });
+        }
         EnsureBlankTrailingCategory();
 
         Shops.Clear();
@@ -107,7 +130,14 @@ public partial class AddListViewModel : BaseViewModel
         var shopsString = ShopsDisplay;
 
         if (IsCreateMode)
-            await _listService.CreateListAsync(Name.Trim(), shopsString);
+        {
+            var list = await _listService.CreateListAsync(Name.Trim(), shopsString);
+            foreach (var c in Categories.Where(c => !string.IsNullOrWhiteSpace(c.Name)))
+            {
+                var created = await _categoryService.CreateCategoryForListAsync(c.Name.Trim(), list.Id);
+                c.Id = created.Id;
+            }
+        }
         else
             await _listService.UpdateListAsync(ListId, Name.Trim(), shopsString);
 
@@ -164,9 +194,11 @@ public partial class AddListViewModel : BaseViewModel
             return;
         }
 
+        if (!IsEditMode) return;  // deferred — all categories are persisted in SaveAsync
+
         if (item.Id == 0)
         {
-            var created = await _categoryService.CreateCategoryAsync(name);
+            var created = await _categoryService.CreateCategoryForListAsync(name, ListId);
             item.Id = created.Id;
         }
         else
@@ -304,4 +336,72 @@ public partial class AddListViewModel : BaseViewModel
 
     [RelayCommand]
     void CancelDeleteList() => ShowDeleteListConfirm = false;
+
+    // ── Default categories (create mode only) ────────────────────────────────
+
+    [RelayCommand]
+    void ToggleDefaultCategories()
+    {
+        if (DefaultsEnabled)
+        {
+            // Toggling OFF — remove all default-seeded categories from the list
+            var toRemove = Categories.Where(c => c.IsFromDefault).ToList();
+            foreach (var c in toRemove)
+                Categories.Remove(c);
+            DefaultsEnabled = false;
+            EnsureBlankTrailingCategory();
+        }
+        else
+        {
+            // Toggling ON — populate options and show the selection modal
+            DefaultCategoryOptions.Clear();
+            foreach (var d in Category.Defaults)
+                DefaultCategoryOptions.Add(new DefaultCategoryOption
+                {
+                    EnglishName = d.Name,
+                    Name        = _loc.TranslateCategoryName(d.Name),
+                    IsSelected  = true,
+                });
+            ShowDefaultCategoriesModal = true;
+        }
+    }
+
+    [RelayCommand]
+    void ToggleDefaultOption(DefaultCategoryOption option) =>
+        option.IsSelected = !option.IsSelected;
+
+    [RelayCommand]
+    void ConfirmDefaultCategories()
+    {
+        ShowDefaultCategoriesModal = false;
+
+        var selected = DefaultCategoryOptions.Where(o => o.IsSelected).ToList();
+        if (!selected.Any())
+        {
+            DefaultsEnabled = false;
+            EnsureBlankTrailingCategory();
+            return;
+        }
+
+        // Remove any previous defaults (idempotent re-confirm)
+        var old = Categories.Where(c => c.IsFromDefault).ToList();
+        foreach (var c in old) Categories.Remove(c);
+
+        // Remove trailing blanks so defaults sit before the new trailing blank
+        var blanks = Categories.Where(c => string.IsNullOrWhiteSpace(c.Name)).ToList();
+        foreach (var b in blanks) Categories.Remove(b);
+
+        foreach (var opt in selected)
+            AddCategoryItem(new CategoryEditItem { Name = opt.Name, IsFromDefault = true });
+
+        DefaultsEnabled = true;
+        EnsureBlankTrailingCategory();
+    }
+
+    [RelayCommand]
+    void CancelDefaultCategories()
+    {
+        ShowDefaultCategoriesModal = false;
+        DefaultsEnabled = false;
+    }
 }

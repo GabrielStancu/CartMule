@@ -313,12 +313,6 @@
                                                         <Setter Property="Stroke" Value="{StaticResource TextCharcoal}" />
                                                     </DataTrigger>
                                                 </Border.Triggers>
-                                                <Label Text="✓"
-                                                       TextColor="White"
-                                                       FontSize="11"
-                                                       HorizontalOptions="Center"
-                                                       VerticalOptions="Center"
-                                                       IsVisible="{Binding IsBought}" />
                                             </Border>
 
                                             <!-- Col 2: Name + Quantity (tap = edit) -->

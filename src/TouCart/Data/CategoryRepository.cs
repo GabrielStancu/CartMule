@@ -19,6 +19,15 @@ public class CategoryRepository : ICategoryRepository
             .ToListAsync();
     }
 
+    public async Task<List<Category>> GetForListAsync(int listId)
+    {
+        var conn = await _context.GetConnectionAsync();
+        return await conn.Table<Category>()
+            .Where(c => c.ListId == listId)
+            .OrderBy(c => c.SortOrder)
+            .ToListAsync();
+    }
+
     public async Task<Category?> GetByIdAsync(int id)
     {
         var conn = await _context.GetConnectionAsync();
@@ -30,7 +39,11 @@ public class CategoryRepository : ICategoryRepository
     public async Task<Category> CreateAsync(Category category)
     {
         var conn = await _context.GetConnectionAsync();
-        var existing = await conn.Table<Category>().OrderByDescending(c => c.SortOrder).FirstOrDefaultAsync();
+        // Scope sort order to the same list (or global if ListId == 0)
+        var existing = await conn.Table<Category>()
+            .Where(c => c.ListId == category.ListId)
+            .OrderByDescending(c => c.SortOrder)
+            .FirstOrDefaultAsync();
         category.SortOrder = (existing?.SortOrder ?? 0) + 10;
         await conn.InsertAsync(category);
         return category;
